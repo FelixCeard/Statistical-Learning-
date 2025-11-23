@@ -1,0 +1,239 @@
+\documentclass{article}
+\usepackage{import}
+
+
+\title{Statisitcal Learning and Stochastic Processes \\Sheet 01 }
+\author{Felix Céard-Falkenberg\\7174020}
+
+\usepackage{homework} % See homework.sty %
+\usepackage{amsmath}
+\usepackage{amssymb}
+\newcommand*\dif{\mathop{}\mathrm{d}}
+\newcommand{\stepandtag}{%
+  \refstepcounter{equation}%
+  \tag{\theequation}%
+}
+\newcommand{\var}{\ensuremath{\text{Var}}}
+
+
+\begin{document}
+
+
+\section{}
+\subsection*{(a)}
+\textit{Find the $\mathbb{E}[ \bar{X}(N)]$ analytically. Does it really estimate the mean
+of $X$?}
+
+We have that \begin{equation*}
+    \bar{X}(N) = \frac{1}{N} \sum_{i=1}^N X_i, \quad X_i \sim \mathrm{Uniform}(0, 1)\ .
+\end{equation*}
+
+We first compute the expectation of $X_i$. We have
+\begin{align*}
+    \mathbb{E}\left[ X_i \right] &= \int_{-\infty}^{\infty} x \cdot p(X=x)\; \dif x \\
+    &= \int_{0}^{1} x \cdot p(X=x) \dif x \\
+    &= \int_{0}^{1} x \cdot \frac{1}{1-0} \dif x \\
+    &= \int_{0}^{1} x \dif x \\
+    &= \left[ \frac{1}{2} x^{2} \right]_0^1 \\
+    &= \frac{1}{2} (1^2 - 0^2) \\
+    &= \frac{1}{2} \stepandtag \label{eq:expected_X_i}
+\end{align*}
+
+
+Therefore, we can compute the expectation of $\bar{X}(N)$ as follows:
+\begin{align*}
+    \mathbb{E}[\bar{X}(N)] &= \mathbb{E}\left[ \frac{1}{n} \sum_{i=1}^n X_i \right] \\
+    &= \frac{1}{n} \sum_{i=1}^{n} \mathbb{E}\left[ X_i \right] \\
+    &\overset{(\ref{eq:expected_X_i})}{=} \frac{1}{n} \sum_{i=1}^{n} \frac{1}{2} \\
+    &= \frac{1}{n} \cdot n \cdot \frac{1}{2} \\
+    &= \frac{1}{2}
+\end{align*}
+
+
+Therefore, the expected value of $\mathbb{E}[ \bar{X}(N)]$ estimates the true mean of $X$.
+
+\subsection*{(b)}
+\textit{Find the $\text{Var}(\bar{X}(N))$ analytically. Hint: find the variance of a
+single $X_i$ first.}
+
+Let us first compute the exectation of $\mathbb{E}[X_i^2]$:
+\begin{align*}
+    \mathbb{E}[X_i^2] &= \int_{0}^{1} x^2 \cdot p(X=x) \; \dif x \\
+    &= \int_{0}^{1} x^2 \cdot {\frac{1}{1-0}} \; \dif x \\
+    &= \int_{0}^{1} x^2\; \dif x \\
+    &= \left[ \frac{1}{3}\cdot x^3 \right]_0^1 \\
+    &= \frac{1}{3}(1 - 0)\\ 
+    &= \frac{1}{3} \stepandtag \label{eq:expectation_X_i_square}
+\end{align*}
+
+We can now compute the variance of a $X_i$ as follows:
+\begin{align*}
+    \var (X_i) &= \mathbb{E}\left[ (X_i - \mathbb{E}[X_i])^2 \right] \\
+    &= \mathbb{E}\left[ (X_i - \frac{1}{2})^2 \right] \\
+    &= \mathbb{E}\left[ X_i^2 + \frac{1^2}{2^2} - 2\cdot X_i \cdot \frac{1}{2} \right] \\
+    &= \mathbb{E}\left[ X_i^2 + \frac{1^2}{2^2} - X_i \right] \\
+    &= \mathbb{E}\left[ X_i^2 \right] + \mathbb{E}\left[\frac{1}{4} \right] - \mathbb{E} \left[X_i \right] \\
+    &= \mathbb{E}\left[ X_i^2 \right] + \frac{1}{4} - \frac{1}{2} \\
+    &\overset{(\ref{eq:expectation_X_i_square})}{=} \frac{1}{3} + \frac{1}{4} - \frac{1}{2} \\
+    &= \frac{4}{12} + \frac{3}{12} - \frac{6}{12} \\
+    &= \frac{1}{12} \; .
+\end{align*}
+
+We can now compute the variance of $\bar{X}(N)$ as follows:
+\begin{align*}
+    \var(\bar{X}(N)) &= \var \left( \frac{1}{N} \sum_{i=1}^N X_i \right) \\
+    &= \frac{1}{N^2} \cdot \var \left( \sum_{i=1}^{N} X_i \right) \\
+    &= \frac{1}{N^2} \cdot \sum_{i=1}^{N} \var(X_i) \stepandtag \label{eq:iid_assumption} \\
+    &= \frac{1}{N^2} \cdot \sum_{i=1}^{N} \frac{1}{12} \\
+    &= \frac{1}{N^2} \cdot N \cdot \frac{1}{12} \\
+    &= \frac{1}{N} \cdot \frac{1}{12}
+\end{align*}
+where Equation~\ref{eq:iid_assumption} holds as each drawing $X_i$ is independent of each other drawing $X_j$ ($\Pr(X_i \mid X_j) = \Pr(X_i)$), and we can therefore use the property of the variance for i.i.d. variables $\var(X+Y) = \var(X) + \var(Y)$. 
+
+Therefore, in the limit, we have
+\begin{equation*}
+    \lim_{n\rightarrow \infty} \var(\bar(X)(N)) = \lim_{n\rightarrow \infty} \frac{1}{N} \cdot \frac{1}{12} = 0
+\end{equation*}
+with a linear convergence rate.
+
+\subsection*{(c)}
+
+The probability density function of $\hat{X}(N)$ is given as 
+\begin{equation*}
+    f_{\hat{X}(N)}(x) = \binom{N}{\frac{N-1}{2}} \cdot \frac{N+1}{2} \cdot x^{\frac{N-1}{2}} \cdot (1-x)^{\frac{N-1}{2}} \;. 
+\end{equation*}
+
+Let us now compute the expectation of $\hat{X}(N)$:
+\begin{align*}
+    \mathbb{E}[\hat{X}(N)] &= \int_{0}^{1} x \cdot f_{\hat{X}(N)}(x) \dif x \\
+    &= \int_{0}^{1} x \cdot \binom{N}{\frac{N-1}{2}} \cdot \frac{N+1}{2} \cdot x^{\frac{N-1}{2}} \cdot (1-x)^{\frac{N-1}{2}} \dif x \\
+    &= \binom{N}{\frac{N-1}{2}} \cdot \frac{N+1}{2} \cdot \int_{0}^{1} x \cdot x^{\frac{N-1}{2}} \cdot (1-x)^{\frac{N-1}{2}} \dif x \\
+    &= \binom{N}{\frac{N-1}{2}} \cdot \frac{N+1}{2} \cdot \int_{0}^{1} x^{\frac{N-1}{2}+1} \cdot (1-x)^{\frac{N-1}{2}} \dif x \\
+    &= \binom{N}{\frac{N-1}{2}} \cdot \frac{N+1}{2} \cdot \int_{0}^{1} x^{\frac{N+1}{2}} \cdot (1-x)^{\frac{N-1}{2}} \dif x \\
+% \end{align*}
+% where we use integration by parts to compute the integral. Let $u(x) = (1-x)^{\frac{N-1}{2}}$ and $v'(x) = x^{\frac{N+1}{2}}$. Then, we can compute the integral $\int_{a}^{b} u(x) \cdot v'(x) \dif x = \left[ u(x) \cdot v(x) \right]_a^b - \int_{a}^{b} u'(x) \cdot v(x) \dif x$. Naturally, we have 
+% \begin{align*}
+%     v(x) &= \int v'(x) \dif x \\
+%     &= \int x^{\frac{N+1}{2}} \dif x\\
+%     &= x^{\frac{N+1}{2}+1} \cdot \frac{1}{\frac{N+1}{2}+1} \\
+%     &= x^{\frac{N+1}{2}+1} \cdot \frac{2}{N+3} \;.
+% \end{align*}
+% We have
+% \begin{align*}
+%     u'(x) &= u(x)\; \frac{\partial}{\partial x} \\
+%     &= (1-x)^{\frac{N-1}{2}} \; \frac{\partial}{\partial x} \\
+%     &= f(g(x))  \; \frac{\partial}{\partial x} & \begin{cases}
+%         f(x) = x^{\frac{N-1}{2}} \\
+%         g(x) = 1-x
+%     \end{cases}  \\
+%     &= f'(g(x)) \cdot g'(x)
+% \end{align*}
+% with 
+% \begin{align*}
+%     f'(x) &= f(x) \frac{\partial}{\partial x} \\
+%     &= x^{\frac{N-1}{2}} \frac{\partial}{\partial x} \\
+%     &= \left( \frac{N-1}{2} \right)\cdot x^{\frac{N-1}{2}-1} \\
+%     &= \left( \frac{N-1}{2} \right)\cdot x^{\frac{N-3}{2}} \\
+% \end{align*}
+% and
+% \begin{align*}
+%     g'(x) &= g(x) \frac{\partial}{\partial x} \\
+%     &= 1-x \frac{\partial}{\partial x} \\
+%     &= -1\;,
+% \end{align*}
+% thus,
+% \begin{align*}
+%     u'(x) &= f'(g(x)) \cdot g'(x) \\
+%     &= \left( \frac{N-1}{2} \right)\cdot g(x)^{\frac{N-3}{2}} \cdot (-1) \\
+%     &= \left( \frac{N-1}{2} \right)\cdot (1-x)^{\frac{N-3}{2}} \cdot (-1) \;.
+% \end{align*}
+% 
+% Finally, we can combine everything and we have
+% \begin{align*}
+%     \mathbb{E}[\hat{X}(N)] &= \binom{N}{\frac{N-1}{2}} \cdot \frac{N+1}{2} \cdot \int_{0}^{1} u(x) \cdot v'(x) \dif x \\
+%     &= \binom{N}{\frac{N-1}{2}} \cdot \frac{N+1}{2} \cdot \left[ u(x) \cdot v(x) \right]_0^1 - \int_{0}^{1} u'(x) \cdot v(x) \dif x \\
+%     &= \binom{N}{\frac{N-1}{2}} \cdot \frac{N+1}{2} \cdot \left[ \left( (1-x)^{\frac{N-1}{2}} \right) \cdot \left( x^{\frac{N+1}{2}+1} \cdot \frac{2}{N+3} \right) \right]_0^1 - \int_{0}^{1} u'(x) \cdot v(x) \dif x \\
+%     &= \binom{N}{\frac{N-1}{2}} \cdot \frac{N+1}{2} \cdot \left( 0 - 1\cdot 1\cdot \frac{2}{N+3} \right) - \int_{0}^{1} u'(x) \cdot v(x) \dif x \\
+%     &= \binom{N}{\frac{N-1}{2}} \cdot \frac{N+1}{2} \cdot \left( 0 - 1\cdot 1\cdot \frac{2}{N+3} \right) - \int_{0}^{1} u'(x) \cdot v(x) \dif x \\
+%     &= \binom{N}{\frac{N-1}{2}} \cdot \frac{N+1}{2} \cdot \left( -\frac{2}{N+1}-\frac{2}{2} \right) - \int_{0}^{1} u'(x) \cdot v(x) \dif x \\
+% \end{align*}
+% 
+% \begin{align*}
+%     \int_{0}^{1} u'(x) \cdot v(x) \dif x &= \int_{0}^{1} \left( \frac{N-1}{2} \right)\cdot (1-x)^{\frac{N-3}{2}} \cdot (-1) \cdot x^{\frac{N+1}{2}+1} \cdot \frac{2}{N+3} \dif x \\
+%     &= - \left( \frac{N-1}{2} \right)  \cdot \frac{2}{N+3} \cdot  \int_{0}^{1} (1-x)^{\frac{N-3}{2}} \cdot x^{\frac{N+1}{2}+1} \dif x 
+% \end{align*}
+% 
+% \begin{align*}
+    % \mathbb{E}[\hat{X}(N)] &= \binom{N}{\frac{N-1}{2}} \cdot \frac{N+1}{2} \cdot \int_{0}^{1} x^{\frac{N+1}{2}} \cdot (1-x)^{\frac{N-1}{2}} \dif x \\ 
+    &= \binom{N}{\frac{N-1}{2}} \cdot \frac{N+1}{2} \cdot \frac{\frac{N+1}{2}! \frac{N-1}{2}!}{\left( \frac{N+1}{2} + \frac{N-1}{2} + 1 \right)!} \stepandtag \label{eq:given_integral_result} \\
+    &= \binom{N}{\frac{N-1}{2}} \cdot \frac{N+1}{2} \cdot \frac{\frac{N+1}{2}! \frac{N-1}{2}!}{\left( \frac{N-1}{2} + \frac{N-1}{2} + 1 + 1 \right)!} \\
+    &= \binom{N}{\frac{N-1}{2}} \cdot \frac{N+1}{2} \cdot \frac{\frac{N+1}{2}! \frac{N-1}{2}!}{\left( 2\cdot \frac{N-1}{2} + 2 \right)!} \\
+    &= \binom{N}{\frac{N-1}{2}} \cdot \frac{N+1}{2} \cdot \frac{\frac{N+1}{2}! \frac{N-1}{2}!}{\left({N-1} + 2 \right)!} \\
+    &= \binom{N}{\frac{N-1}{2}} \cdot \frac{N+1}{2} \cdot \frac{\frac{N+1}{2}! \frac{N-1}{2}!}{\left(N+1 \right)!} \\
+    &= \binom{N}{\frac{N-1}{2}} \cdot \frac{1}{2} \cdot \frac{\left( \frac{N+1}{2} \right)! \frac{N-1}{2}!}{N!} \\
+    &= \frac{N!}{\left(\frac{N-1}{2}  \right)! \left( N-\frac{N-1}{2} \right)!} \cdot \frac{1}{2} \cdot \frac{\left( \frac{N+1}{2} \right)! \frac{N-1}{2}!}{N!} \\
+    &= \frac{1}{\left(\frac{N-1}{2}  \right)! \left( N-\frac{N-1}{2} \right)!} \cdot \frac{1}{2} \cdot \frac{\left( \frac{N+1}{2} \right)! \frac{N-1}{2}!}{1} \\
+    &= \frac{1}{ \left( N-\frac{N-1}{2} \right)!} \cdot \frac{1}{2} \cdot \frac{\left( \frac{N+1}{2} \right)!}{1} \\
+    &= \frac{1}{ \left( \frac{N+1}{2} \right)!} \cdot \frac{1}{2} \cdot \frac{\left( \frac{N+1}{2} \right)!}{1} \stepandtag \label{eq:another_derivation} \\
+    &= \frac{1}{2}
+\end{align*}
+where we used the given known integral rule to obtain Equation~\ref{eq:given_integral_result}, and Equation~\ref{eq:another_derivation} results from 
+\begin{align*}
+    N - \frac{N-1}{2} &= \frac{2 N}{2} - \frac{N-1}{2} \\
+    &= \frac{N + N - (N-1)}{2} \\
+    &= \frac{N + 1}{2} \;.
+\end{align*}
+
+Therefore, the exectation of the of $\hat{X}(N)$ is $\frac{1}{2}$, i.e., the true mean of $X$.
+
+\subsection*{(d)}
+\textit{Find the $\var(\hat{X}(N))$ analytically. Which distribution has the
+better variance $\bar{X}(N)$ or $\hat{X}(N)$?}
+
+We compute the expectation of $\hat{X}(N)^2$:
+\begin{align*}
+    \mathbb{E}[\hat{X}(N)^2] &= \int_{0}^{1} x^2 \cdot f_{\hat{X}(N)}(x) \dif x \\
+    &= \binom{N}{\frac{N-1}{2}} \cdot \frac{N+1}{2} \cdot \int_{0}^{1} x^2 \cdot x^{\frac{N-1}{2}} \cdot (1-x)^{\frac{N-1}{2}} \dif x \\
+    &= \binom{N}{\frac{N-1}{2}} \cdot \frac{N+1}{2} \cdot \int_{0}^{1} x^{\frac{N-1}{2}+2} \cdot (1-x)^{\frac{N-1}{2}} \dif x \\
+    &= \binom{N}{\frac{N-1}{2}} \cdot \frac{N+1}{2} \cdot \int_{0}^{1} x^{\frac{N+3}{2}} \cdot (1-x)^{\frac{N-1}{2}} \dif x \\
+    &= \binom{N}{\frac{N-1}{2}} \cdot \frac{N+1}{2} \cdot \frac{\frac{N+3}{2}! \frac{N-1}{2}!}{\left( \frac{N+3}{2} + \frac{N-1}{2} + 1 \right)!} \\
+    &= \binom{N}{\frac{N-1}{2}} \cdot \frac{N+1}{2} \cdot \frac{\frac{N+3}{2}! \frac{N-1}{2}!}{\left( \frac{N-1}{2} + \frac{N-1}{2} + 1 + 2 \right)!} \\
+    &= \binom{N}{\frac{N-1}{2}} \cdot \frac{N+1}{2} \cdot \frac{\frac{N+3}{2}! \frac{N-1}{2}!}{\left( 2\cdot\frac{N-1}{2} + 3 \right)!} \\
+    &= \binom{N}{\frac{N-1}{2}} \cdot \frac{N+1}{2} \cdot \frac{\frac{N+3}{2}! \frac{N-1}{2}!}{\left( N-1 + 3 \right)!} \\
+    &= \binom{N}{\frac{N-1}{2}} \cdot \frac{N+1}{2} \cdot \frac{\frac{N+3}{2}! \frac{N-1}{2}!}{\left( N+2 \right)!} \\
+    &= \binom{N}{\frac{N-1}{2}} \cdot \frac{N+1}{2} \cdot \frac{\frac{N+3}{2}! \frac{N-1}{2}!}{(N+2)\cdot\left( N+1 \right)!} \\
+    &= \binom{N}{\frac{N-1}{2}} \cdot \frac{1}{2} \cdot \frac{\frac{N+3}{2}! \frac{N-1}{2}!}{(N+2)\cdot N !} \\
+    &= \frac{N!}{\left(\frac{N-1}{2}  \right)! \left( N-\frac{N-1}{2} \right)!} \cdot \frac{1}{2} \cdot \frac{\frac{N+3}{2}! \frac{N-1}{2}!}{(N+2)\cdot N !} \\
+    &= \frac{1}{\left(\frac{N-1}{2}  \right)! \left( N-\frac{N-1}{2} \right)!} \cdot \frac{1}{2} \cdot \frac{\frac{N+3}{2}! \frac{N-1}{2}!}{(N+2)} \\
+    &= \frac{1}{\left( N-\frac{N-1}{2} \right)!} \cdot \frac{1}{2} \cdot \frac{\frac{N+3}{2}!}{(N+2)} \\
+    &= \frac{1}{\frac{N+1}{2}!} \cdot \frac{1}{2} \cdot \frac{\frac{N+3}{2}!}{(N+2)} \\
+    &= \frac{1}{\frac{N+1}{2}!} \cdot \frac{1}{2} \cdot \frac{\frac{N+3}{2}\cdot \left(  \frac{N+1}{2}\right)!}{(N+2)} \\
+    &= \frac{1}{2} \cdot \frac{\frac{N+3}{2}}{(N+2)} \\
+    &= \frac{1}{2} \cdot \frac{\frac{N+3}{2} \cdot 2}{(N+2) \cdot 2} \\
+    &= \frac{1}{2} \cdot \frac{N+3}{(N+2) \cdot 2} \\
+    &= \frac{1}{2} \cdot \frac{N+2 + 1}{(N+2) \cdot 2} \\
+    &= \frac{1}{2} \cdot \left( \frac{N+2}{(N+2) \cdot 2} + \frac{1}{(N+2) \cdot 2}  \right) \\
+\end{align*}
+
+\begin{align*}
+    &= \frac{1}{2} \cdot \left( \frac{1}{2} + \frac{1}{2N+4}  \right) \\
+    &= \frac{1}{4} + \frac{1}{4N+8} \\
+\end{align*}
+     
+We can finally compute the variance of $\hat{X}(N)$ as follows:
+\begin{align*}
+    \var(\hat{X}(N)) &= \mathbb{E}[\hat{X}(N)^2] - \mathbb{E}[\hat{X}(N)]^2 \\
+    &= \mathbb{E}[\hat{X}(N)^2] - \left( \frac{1}{2} \right)^2 \\
+    &= \mathbb{E}[\hat{X}(N)^2] - \frac{1}{4} \\
+    &= \frac{1}{4} + \frac{1}{4N+8} - \frac{1}{4} \\
+    &= \frac{1}{4N+8}
+\end{align*}
+which, in the limit, converges to zero:
+\begin{align*}
+    \lim_{N\rightarrow \infty} \var(\hat{X}(N)) = \lim_{N\rightarrow \infty} \frac{1}{4N+8} = 0
+\end{align*}
+
+As the convergence rate of $\var(\hat{X}(N))$ is faster than $\var(\bar{X}(N))$, and that both have the same (correct) expectation, we can conclude that $\hat{X}(N)$ has the better variance.
+
+
+\end{document}
