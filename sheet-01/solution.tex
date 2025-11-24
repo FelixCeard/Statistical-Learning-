@@ -8,6 +8,7 @@
 \usepackage{homework} % See homework.sty %
 \usepackage{amsmath}
 \usepackage{amssymb}
+\usepackage[utf8]{inputenc}
 \newcommand*\dif{\mathop{}\mathrm{d}}
 \newcommand{\stepandtag}{%
   \refstepcounter{equation}%
@@ -341,6 +342,246 @@ Therefore, the expected gain when playing game B in the long run is
     &= -0.0086952867
 \end{align*}
 
+\subsection*{(c)}
+See provided code.
+
+\subsection*{(d)}
+
+% We extend the Markov chain of (b) by adding three extra states: $3, 4$, and $5$, which denotes again the current capital module 3. We introduce the three new states for representing the states of game A, whereas the current three states ($0, 1, 2$) represent the states of game B.
+We first observe that we can keep the same three states of the Markov chain as introduced in (b). However, we need to update the transition matrix $P$.
+We now construct $P$ to model the transition between the states given that the player \textit{plays the random game with equal probabilities every time}, i.e., plays game A with probability $0.5$ and game B with probability $0.5$. Let us denote the transition matrix of game B as introduced in (b) as $P_B$. We now construct the transition matrix $P_A$ for game A as follows:
+\begin{equation*}
+    P_A = \begin{pmatrix}
+        0.0 & 0.495 & 0.505 \\
+        0.505 & 0.0 & 0.495 \\
+        0.495 & 0.505 & 0.0
+    \end{pmatrix}
+\end{equation*}
+where in each state, the probability of winning one dollar is $0.495$ and the probability of losing one dollar is $0.505$. We can now construct the transition matrix for the combined Markov chain, i.e., when playing both games with equal probabilities, as follows:
+\begin{align*}
+    P &= 0.5 \cdot P_A + 0.5 \cdot P_B \\
+    &= \begin{pmatrix}
+        0.0   & 0.295 & 0.705 \\
+        0.38  & 0.0   & 0.62  \\
+        0.62  & 0.38  & 0.0  
+    \end{pmatrix}\;.
+\end{align*}
+
+We can now compute the stationary distribution of the new Markov chain as done in (b). In the following derivation, we may skip some steps for brevity, as the exact same derivation process as in (b) is followed.
+
+We start by computing $\pi_0$ as
+\begin{equation}
+    \pi_0 = \pi_1 \cdot 0.38 + \pi_2 \cdot 0.62
+\end{equation}
+and 
+\begin{align*}
+    \pi_1 &= \pi_0 \cdot 0.295 + \pi_2 \cdot 0.38 \\
+    \pi_1 &= \left( \pi_1 \cdot 0.38 + \pi_2 \cdot 0.62 \right) \cdot 0.295 + \pi_2 \cdot 0.38 \\
+    \pi_1 &= \pi_1 \cdot 0.1121 + \pi_2 \cdot 0.1829 + \pi_2 \cdot 0.38 \\
+    % \pi_1 \cdot(1 - 0.1121) &= + \pi_2 \cdot 0.5629 \\
+    \pi_1 &= \pi_2 \cdot 0.6339677892 \;.
+\end{align*}
+
+Thus, we can compute $\pi_2$:
+\begin{align*}
+    1 &= \pi_0 + \pi_1 + \pi_2 \\
+    1 &= \left( \pi_1 \cdot 0.38 + \pi_2 \cdot 0.62 \right) + \pi_1 + \pi_2 \\
+    1 &= \pi_1 \cdot 1.38 + \pi_2 \cdot 1.62  \\
+    1 &= \pi_2 \cdot 0.6339677892 \cdot 1.38 + \pi_2 \cdot 1.62  \\
+    1 &= \pi_2 \cdot 2.4948755491  \\
+    \pi_2 &= \frac{1}{2.4948755491} \\
+    \pi_2 &= 0.4008215962
+\end{align*}
+and infer $\pi_0$ and $\pi_1$:
+\begin{align*}
+    \pi_1 &= \pi_2 \cdot 0.6339677892 \\
+    &= 0.2541079812
+\end{align*}
+and 
+\begin{align*}
+    \pi_0 &= \pi_1 \cdot 0.38 + \pi_2 \cdot 0.62 \\
+    &= 0.2541079812 \cdot 0.38 + 0.4008215962 \cdot 0.62 \\
+    &= 0.3450704225
+\end{align*}
+
+Therefore, we can now compute the expected gain when playing the new game by first extracting the probabilities of winning and losing in each state. Let us denote the state $0, 1, 2$ as $A, B, C$ to ease the notation. We have 
+\begin{gather*}
+    A_+ = 0.295 \\
+    A_- = 0.705 \\
+    B_+ = 0.62 \\
+    B_- = 0.38 \\
+    C_+ = 0.62 \\
+    C_- = 0.38
+\end{gather*}
+and can finally compute the expected gain of the new Markov chain as follows:\!\footnote{We could also summarize Equation~\ref{eq:new_formular} by clusting $\pi_1$ and $\pi_2$ into a single term as done in the assignment sheet. However, the formulation in Equation~\ref{eq:new_formular} makes the derivation more transparent.}
+\begin{align*}
+    E &= \pi_0 \cdot (A_+ - A_-) + \pi_1 \cdot (B_+ - B_-) + \pi_2 \cdot (C_+ - C_-) \stepandtag \label{eq:new_formular} \\
+    &= \pi_0 \cdot (0.295 - 0.705) + \pi_1 \cdot (0.62 - 0.38) + \pi_2 \cdot (0.62 - 0.38) \\
+    &= 0.3450704225 \cdot (-0.41) +  0.2541079812 \cdot 0.24 + 0.4008215962 \cdot 0.24 \\
+    &= 0.01570422535
+\end{align*}
+
+Therefore, the expected gain when playing the new game is positive, indicating that, on average, the player will win in the long run.
+
+\subsection*{(e)}
+See provided code.
+
+\subsection*{(f)}
+\textit{Show analytically that the provided periodic strategy is winning in a long run.}
+
+We wish to investigate whether playing both games in a given sequence (ABBABBABB...) is also winning.
+
+We observe that the sequence is a repeating pattern of playing game A followed by playing game B two times.
+We can therefore compute the transition matrix for one of such patterns as follows:
+\begin{equation*}
+    P_{ABB} = P_A \cdot P_B \cdot P_B = P_A \cdot P_B^2 \;.
+\end{equation*}
+Note that the complete transition matrix of the Markov chain $P = (P_{ABB})^\infty$, which is equivalent to playing the game in a repeating pattern of ABBABBABB... in the long run. To this end, we will compute the stationary distribution of $P_{ABB}$ which will indicate whether playing the game in this pattern is winning.
+
+We therefore use $P_A$ and $P_B$ as previously introduced in (b) and (d) and compute $P_B^2$:
+\begin{align*}
+    P_B^2 &= P_B \cdot P_B \\
+    &= \begin{pmatrix}
+        0.69845 & 0.230775 & 0.070775 \\
+        0.555025 & 0.2142 & 0.230775 \\
+        0.065025 & 0.070775 & 0.8642
+    \end{pmatrix}\;.
+\end{align*}
+Finally, we can compute $P_{ABB}$:
+\begin{align*}
+    P_{ABB} &= P_A \cdot P_B^2 \\
+    &= \begin{pmatrix}
+        0.307575 & 0.14177038 & 0.55065462 \\
+        0.38490463 & 0.151575 & 0.46352037 \\
+        0.62602038 & 0.22240463 & 0.151575
+    \end{pmatrix}\;.
+\end{align*}
+
+We now compute the stationary distribution $\pi$ of $P_{ABB}$. We, again, reuse the same derivation process as in (b) and may therefore skip some steps for brevity.
+
+\begin{align*}
+    \pi_0 &= \pi_0 \cdot 0.307575 + \pi_1 \cdot 0.38490463 + \pi_2 \cdot 0.62602038 \\
+    \pi_0 \cdot (1 - 0.307575) &= \pi_1 \cdot 0.38490463 + \pi_2 \cdot 0.62602038 \\
+    \pi_0 &= \pi_1 \cdot \frac{0.38490463}{0.692425} + \pi_2 \cdot \frac{0.62602038}{0.692425} \\
+    \pi_0 &= \pi_1 \cdot 0.5558791638 + \pi_2 \cdot 0.9040984655 \stepandtag \label{eq:pi_0_ABB} \\
+\end{align*}
+and 
+\begin{align*}
+    \pi_1 &= \pi_0 \cdot 0.14177038 + \pi_1 \cdot 0.151575 + \pi_2 \cdot 0.22240463 \\
+    \pi_1 \cdot (1- 0.151575) &= \pi_0 \cdot 0.14177038 + \pi_2 \cdot 0.22240463 \\
+    \pi_1 &= \pi_0 \cdot 0.1670983057 + \pi_2 \cdot 0.2621382326 \\
+    \pi_1 &\overset{(\ref{eq:pi_0_ABB})}{=} \left( \pi_1 \cdot 0.5558791638 + \pi_2 \cdot 0.9040984655 \right) \cdot 0.1670983057 + \pi_2 \cdot 0.2621382326 \\
+    \pi_1 &= \pi_2 \cdot 0.455523525 \;.
+\end{align*}
+
+Therefore, we have 
+\begin{align*}
+    1 &= \pi_0 + \pi_1 + \pi_2 \\
+    1 &= \left( \pi_1 \cdot 0.5558791638 + \pi_2 \cdot 0.9040984655 \right) + \pi_1 + \pi_2 \\
+    1 &= \pi_1 \cdot 1.5558791638 + \pi_2 \cdot 1.9040984655 \\
+    1 &= \pi_2 \cdot 0.455523525 \cdot 1.5558791638 + \pi_2 \cdot 1.9040984655 \\
+    1 &= \pi_2 \cdot 2.6128380267 \\
+    \pi_2 &= \frac{1}{2.6128380267} \\
+    \pi_2&= 0.3827255994 \;.
+\end{align*}
+Furthermore, 
+\begin{align*}
+    \pi_1 &= \pi_2 \cdot 0.455523525\\
+    &= 0.3827255994 \cdot 0.455523525 \\
+    &= 0.1743405141
+\end{align*}
+and 
+\begin{align*}
+    \pi_0 &= \pi_1 \cdot 0.5558791638 + \pi_2 \cdot 0.9040984655 \\
+    &= 0.1743405141 \cdot 0.5558791638 + 0.3827255994 \cdot 0.9040984655 \\
+    &= 0.4429338863\;.
+\end{align*}
+
+Lastly, we compute the expected gain when playing this repeating pattern in the long run.
+As $P$ now represents three rounds instead of one, we need to compute the values for $A_-, A_+, \dots$.
+% Note that we can ignore the transitions where we stay in the same state, and only consider gains and losses when transitioning to a higher or lower state.
+% \begin{align*}
+%     E &= \pi_0 \cdot (A_+ - A_-) + \pi_1 \cdot (B_+ - B_-) + \pi_2 \cdot (C_+ - C_-) \\
+%     &= \pi_0 \cdot (0.14177038 - 0.55065462) + \pi_1 \cdot (0.46352037 - 0.38490463) + \pi_2 \cdot (0.62602038 - 0.22240463) \\
+%     &= \pi_0 \cdot (-0.40888424) + \pi_1 \cdot 0.07861574 + \pi_2 \cdot 0.40361575 \\
+%     &= 0.4429338863 \cdot (-0.40888424) + 0.1743405141 \cdot 0.07861574 + 0.3827255994 \cdot 0.40361575 \\
+%     &= 0.4429338863 \cdot (-0.40888424) + 0.1743405141 \cdot 0.07861574 + 0.3827255994 \cdot 0.40361575 \\
+%     &= -0.0129286971\;.
+% \end{align*}
+% This indicates that playing the game in this repeating patterin is losing in the long run.
+
+
+From this, we can compute the expected gain for a playing a round of game A in the long run. Note that we can read $A_+, A_-, \dots$ directly from $P_A$.
+\begin{align*}
+    E^{(A)} &= \pi_0 \cdot (A_+ - A_-) + \pi_1 \cdot (B_+ - B_-) + \pi_2 \cdot (C_+ - C_-) \\
+    &= \pi_0 \cdot (0.495 - 0.505) + \pi_1 \cdot (0.495 - 0.505) + \pi_2 \cdot (0.495 - 0.505) \\
+    &= (0.495 - 0.505) \cdot \left( \pi_0 + \pi_1 + \pi_2 \right) \\
+    &= (-0.01) \cdot 1\\ &= -0.01\;.
+\end{align*}
+
+For computing the average reward for playing the first round of game B after game A,  we compute the probability of being in each state after having played game A:
+\begin{align*}
+    \pi^{(A)} &= \pi \cdot P_A \\
+    &= \begin{pmatrix}
+        0.4429338863 & 0.1743405141 & 0.3827255994
+    \end{pmatrix} \cdot \begin{pmatrix}
+        0.0 & 0.495 & 0.505 \\
+        0.505 & 0.0 & 0.495 \\
+        0.495 & 0.505 & 0.0
+    \end{pmatrix} \\
+    &= \begin{pmatrix}
+        0.27749113 & 0.4125287 & 0.30998017
+    \end{pmatrix}\;.
+\end{align*}
+
+The expected gain is 
+\begin{align*}
+    E^{(AB)} &= \pi^{(A)}_0 \cdot (A_+ - A_-) + \pi_1^{(A)} \cdot (B_+ - B_-) + \pi_2^{(A)} \cdot (C_+ - C_-) \\
+    &= \pi_0^{(A)} \cdot (0.095 - 0.905) + \pi_1^{(A)} \cdot (0.745 - 0.255) + \pi_2^{(A)} \cdot (0.745 - 0.255) \\
+    &= 0.27749113 \cdot (-0.81) + 0.4125287 \cdot 0.49 + 0.30998017 \cdot 0.49 \\
+    &= 0.129261531\;.
+\end{align*}
+
+Similarly, we can compute the expected gain for playing a round of game B after playing a round of game A.
+\begin{align*}
+    \pi^{(AB)} &= \pi^{(A)} \cdot P_B \\
+    &= \begin{pmatrix}
+        0.33613004 & 0.1054066 & 0.55846336
+    \end{pmatrix}
+\end{align*}
+and 
+% Therefore, the expectedg gain in the last second round of playing game B is
+\begin{align*}
+    E^{(ABB)} &= \pi^{(AB)}_0 \cdot (A_+ - A_-) + \pi_1^{(AB)} \cdot (B_+ - B_-) + \pi_2^{(AB)} \cdot (C_+ - C_-) \\
+    &= 0.33613004 \cdot (-0.81) + 0.1054066 \cdot 0.49 + 0.55846336 \cdot 0.49 \\
+    &= 0.053030948\;.
+\end{align*} 
+
+To total expected reward for playing all three rounds can be computed as follows:
+\begin{align*}
+    E &= E^{(A)} + E^{(AB)} + E^{(ABB)} \\
+    &= (-0.01) + 0.129261531 + 0.053030948 \\
+    &= 0.172292479\;.
+\end{align*}
+this shows that playing all three rounds in this specific order yields a positive expected reward, and therefore is winning in the long run.
+
+
+% Finally, we compute the probability of each state after playing the second round of game B:
+\textit{(Optional)}\\
+We can verify that $\pi^{(AB)}$ is valid by computing the probability of each state after the second round of game B: 
+\begin{align*}
+    \pi^{(ABB)} &= \pi^{(AB)} \cdot P_B \\
+    &= \begin{pmatrix}
+        0.44293388 & 0.17434051 & 0.38272561
+    \end{pmatrix}\;.
+\end{align*}
+We remark that $\pi^{(ABB)} = \pi$, which is expected, as we just computed $\pi \cdot P$ step by step. 
+
+
+\pagebreak
+\section*{Statement on the Useage of Gen. AI}
+
+I used ChatGPT to help find literature on the properties of integration, differentiation. Otherwise, all code and text has been written entirely by me.
 
 
 \end{document}
