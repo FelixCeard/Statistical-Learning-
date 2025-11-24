@@ -19,7 +19,7 @@
 \begin{document}
 
 
-\section{}
+\section*{Problem 1}
 \subsection*{(a)}
 \textit{Find the $\mathbb{E}[ \bar{X}(N)]$ analytically. Does it really estimate the mean
 of $X$?}
@@ -234,6 +234,113 @@ which, in the limit, converges to zero:
 \end{align*}
 
 As the convergence rate of $\var(\hat{X}(N))$ is slower than $\var(\bar{X}(N))$, and that both have the same (correct) expectation, we can conclude that $\bar{X}(N)$ has the better variance, i.e., it is better to estimate the mean of a uniform distribution by using the mean of the samples instead of the median.
+
+\subsection*{(e)}
+See provided code.
+
+\pagebreak
+\section*{Problem 2}
+
+\subsection*{(a)}
+\textit{Show that if $E < 0$, then the game is losing in a long run and if $E > 0$, then the game is winning in a long run.}
+
+Let $\pi$ be the stationary distribution of the Markov chain, and 
+\begin{equation*}
+    E = \pi_0 \cdot (B1_+ - B1_-) + (\pi_1 + \pi_2) \cdot (B2_+ - B2_-) \;.
+\end{equation*}
+
+We remark that $E$ is composed of two sums, the first sum (which includes $\pi_0$) denotes the expected return when in state $0$. As $\pi$ is the stationary distribution, the state $0$ is reached with $\pi_0$ probability at each time step in the long run. The $(B1_+ - B1_-)$ part is positive if probability of gaining one dollar is greater than losing one dollar when playing game $B$ while in state $0$.\!\footnote{See the definition of the states in (b).}
+
+Because the second part of the equation follows the same structure (one could multiply out $(\pi_1 + \pi_2)$ to obtain the same argument for the two remaning states of the Markov chain), we can conclude that $E$ denotes the expected \emph{gain} (or \emph{return}) when playing game B in the long run.
+
+Therefore, if the expected gain is negative, the game is losing in the long run. On the other hand, a positive expected gain would imply that the game is winning.
+
+
+
+\subsection*{(b)}
+
+We three states in our Markov chain: $0$, $1$, and $2$, which denotes the number that results from the current capital modulo 3.
+We now define the transition matrix $P$ as follows:
+\begin{equation*}
+    P = \begin{pmatrix}
+        0.0 & 0.095 & 0.905  \\ 
+        0.255 & 0.0 & 0.745 \\
+        0.745 & 0.255 & 0.0
+    \end{pmatrix}
+\end{equation*}
+
+We remark that each play results in a win or a loss, and therefore a probability of $0.0$ to stay in the same state after playing a round, hence, the diagonal elements of $P$ are all $0.0$.
+
+The stationary distribution of the Markov chain is denoted as 
+\begin{equation*}
+    \pi := \begin{pmatrix}
+        \pi_0 &
+        \pi_1 & 
+        \pi_2
+    \end{pmatrix} \;.
+\end{equation*}
+
+We now compute the stationary distribution from $P$ by computing the stationary value for each $\pi_i$.
+\begin{align*}
+    \pi_0 &= \pi_0 \cdot 0.0 + \pi_1 \cdot 0.255 + \pi_2 \cdot 0.745\\
+    &= \pi_1 \cdot 0.255 + \pi_2 \cdot 0.745 \stepandtag \label{eq:pi_0}
+\end{align*}
+
+\begin{align*}
+    \pi_1 &= \pi_0 \cdot 0.095 + \pi_1 \cdot 0.0 + \pi_2 \cdot 0.255\\
+    \pi_1 &= \pi_0 \cdot 0.095 + \pi_2 \cdot 0.255\\
+    \pi_1 &\overset{(\ref{eq:pi_0})}{=} \left( \pi_1 \cdot 0.255 + \pi_2 \cdot 0.745 \right) \cdot 0.095 + \pi_2 \cdot 0.255\\
+    \pi_1 &=  \pi_1 \cdot 0.255 \cdot 0.095 + \pi_2 \cdot 0.745 \cdot 0.095 + \pi_2 \cdot 0.255 &&\mid -\left( \pi_1 \cdot 0.255 \cdot 0.095 \right) \\
+    \pi_1 (1 - 0.024225) &= \pi_2 \cdot 0.745 \cdot 0.095 + \pi_2 \cdot 0.255 && \mid \div (1 - 0.024225) \\
+    \pi_1 &= \frac{\pi_2 \cdot \left( 0.255 + 0.070775 \right)}{(1 - 0.024225)}  \\
+    \pi_1 &= \pi_2 \cdot  \frac{0.325775}{0.975775}  \\
+    \pi_1 &= \pi_2 \cdot  0.333862827  \stepandtag \label{eq:pi_1} \\
+\end{align*}
+
+
+Using the fact that $\pi_0 + \pi_1 + \pi_2 = 1$, we can now compute $\pi_2$:
+\begin{align*}
+    1 &= \pi_0 + \pi_1 + \pi_2 \\
+    1 &\overset{(\ref{eq:pi_0})}{=} \left( \pi_1 \cdot 0.255 + \pi_2 \cdot 0.745 \right) + \pi_1 + \pi_2 \\
+    1 &= \pi_1 \cdot 1.255 + \pi_2 \cdot 1.745 \\
+    1 &\overset{(\ref{eq:pi_1})}{=} \left( \pi_2 \cdot  0.333862827 \right) \cdot 1.255 + \pi_2 \cdot 1.745 \\
+    1 &= \pi_2 \cdot  0.4189978479 + \pi_2 \cdot 1.745 \\
+    1 &= \pi_2 \cdot  2.1639978479 \\
+    \pi_2 &= \frac{1}{2.1639978479} \\
+    \pi_2&= 0.4621076684
+\end{align*}
+from which we can infer 
+\begin{align*}
+    \pi_1 &= \pi_2 \cdot  0.333862827 \\ &= 0.4621076684 \cdot 0.333862827 \\ &= 0.1542805726
+\end{align*}
+and
+\begin{align*}
+    \pi_0 &= \pi_1 \cdot 0.255 + \pi_2 \cdot 0.745 \\
+    &= 0.1542805726 \cdot 0.255 + 0.4621076684 \cdot 0.745 \\
+    &= 0.03934154601 + 0.344270213 \\
+    &= 0.383611759 \;.
+\end{align*}
+
+Therefore, we have the stationary distribution
+\begin{equation*}
+    \pi = \begin{pmatrix}
+        0.383611759 &
+        0.1542805726 &
+        0.4621076684
+    \end{pmatrix}
+\end{equation*}
+with $\pi = \pi P$ and total sum of one ($0.383611759 + 0.1542805726 + 0.4621076684 = 1$).
+
+Therefore, the expected gain when playing game B in the long run is 
+\begin{align*}
+    E &= \pi_0 \cdot (B1_+ - B1_-) + (\pi_1 + \pi_2) \cdot (B2_+ - B2_-) \\
+    &= \pi_0 \cdot (0.095 - 0.905) + (\pi_1 + \pi_2) \cdot (0.745 - 0.255) \\
+    &= 0.383611759 \cdot (-0.81) + (0.1542805726 + 0.4621076684) \cdot 0.49 \\
+    &= 0.383611759 \cdot (-0.81) + 0.616388241 \cdot 0.49 \\
+    % &= 0.383611759 \cdot (0.095 - 0.905) + (0.1542805726 + 0.4621076684) \cdot (0.745 - 0.255) \\
+    &= -0.0086952867
+\end{align*}
+
 
 
 \end{document}
