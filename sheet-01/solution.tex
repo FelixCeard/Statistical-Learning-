@@ -578,7 +578,93 @@ We can verify that $\pi^{(AB)}$ is valid by computing the probability of each st
 We remark that $\pi^{(ABB)} = \pi$, which is expected, as we just computed $\pi \cdot P$ step by step. 
 
 \pagebreak
-\section*{Problem 3}
+\section*{Problem 4}
+
+\subsection*{(b)}
+We got given the following formula for the likelihood of observing counts with selected
+model parameters as
+
+\begin{align*}
+    L(\lambda_{bg}, \lambda_{burst}) &= \prod_{i}^{} P(c_i \mid \lambda_{bg} , \lambda_{burst}) \\
+    &= \prod_{i:t_i < t_{start} \text{ or } t_i > t_{end}}^{} \frac{\exp(-\lambda_{bg}) \cdot \lambda_{bg}^{c_i}}{c_i!} \cdot \prod_{i:t_{start} \leq t_i \leq t_{end}}^{} \frac{\exp(-\lambda_{burst}) \cdot \lambda_{burst}^{c_i}}{c_i!}
+\end{align*}
+where $c_i$ is the number of counts in bin $i$ starting at time $t_i$.
+
+We now derive the maximum likelihood estimate for the model parameters $\lambda_{bg}$ and $\lambda_{burst}$.
+\begin{align*}
+    \log L(\lambda_{bg}, \lambda_{burst}) &= \sum_{i:t_i < t_{start} \text{ or } t_i > t_{end}}^{} \log \left( \frac{\exp(-\lambda_{bg})\cdot \lambda_{bg}^{c_i}}{c_i!} \right) + \sum_{i:t_{start} \leq t_i \leq t_{end}}^{} \log \left( \frac{\exp(-\lambda_{burst})\cdot \lambda_{burst}^{c_i}}{c_i!} \right) \\
+    &= \sum_{i:t_i < t_{start} \text{ or } t_i > t_{end}}^{} \log \left( {\exp(-\lambda_{bg})\cdot \lambda_{bg}^{c_i}} \right) - \log \left( c_i! \right) + \sum_{i:t_{start} \leq t_i \leq t_{end}}^{} \log \left( {\exp(-\lambda_{burst})\cdot \lambda_{burst}^{c_i}} \right) - \log \left( c_i! \right) \\
+    % &= \sum_{i:t_i < t_{start} \text{ or } t_i > t_{end}}^{} -\lambda_{bg} + \lambda_{bg}^{c_i} - \log \left( c_i! \right) + \sum_{i:t_{start} \leq t_i \leq t_{end}}^{} -\lambda_{burst} + \lambda_{burst}^{c_i} - \log \left( c_i! \right)
+    &= \sum_{i:t_i < t_{start} \text{ or } t_i > t_{end}}^{} -\lambda_{bg} + c_i\cdot\log(\lambda_{bg}) - \log \left( c_i! \right) + \sum_{i:t_{start} \leq t_i \leq t_{end}}^{} -\lambda_{burst} + c_i\cdot\log(\lambda_{burst}) - \log \left( c_i! \right) \\
+    % &= \sum_{i:t_i < t_{start} \text{ or } t_i > t_{end}}^{} \lambda_{bg} \cdot(c_i - 1) - \log \left( c_i! \right) + \sum_{i:t_{start} \leq t_i \leq t_{end}}^{} \lambda_{burst}\cdot(c_i - 1) - \log \left( c_i! \right)
+\end{align*}
+
+Which we can now use to compute the gradients w.r.t. to $\lambda$:
+\begin{align*}
+    \frac{\partial \log L(\lambda_{bg}, \lambda_{burst})}{\partial \lambda_{bg}} &= \sum_{i:t_i < t_{start} \text{ or } t_i > t_{end}}^{} -1 + c_i \cdot \frac{1}{\lambda_{bg}} \\
+    \frac{\partial \log L(\lambda_{bg}, \lambda_{burst})}{\partial \lambda_{burst}} &= \sum_{i:t_{start} \leq t_i \leq t_{end}}^{} -1 + c_i \cdot \frac{1}{\lambda_{burst}} 
+\end{align*}
+thus
+\begin{equation*}
+    \nabla \log L(\lambda_{bg}, \lambda_{burst}) = \begin{pmatrix}
+        \sum_{i:t_i < t_{start} \text{ or } t_i > t_{end}}^{} -1 + c_i \cdot \frac{1}{\lambda_{bg}} \\
+        \sum_{i:t_{start} \leq t_i \leq t_{end}}^{} -1 + c_i \cdot \frac{1}{\lambda_{burst}} 
+    \end{pmatrix}\;.
+\end{equation*}
+
+We can now find the stationary points of the gradients. 
+% We observe that both derivatives are sums of $c_i \cdot \lambda^{c_i-1} - 1$. Therefore, we can set the gradient to zero by finding a value for $\lambda$ for which $c_i\cdot\lambda^{c_i-1}$ is centered around -1.
+
+We use both gradient descent and Newton's method to find the stationary points for the MLE. For Newton's method, we compute the Hessian as follows:
+\begin{align*}
+    H &= \begin{pmatrix}
+        \frac{\partial^2 \log L(\lambda_{bg}, \lambda_{burst})}{\partial {\lambda_{bg}}^2} & \frac{\partial^2 \log L(\lambda_{bg}, \lambda_{burst})}{\partial \lambda_{bg} \cdot \lambda_{burst}} \\
+        \frac{\partial^2 \log L(\lambda_{bg}, \lambda_{burst})}{\partial \lambda_{burst} \cdot \lambda_{bg}} & \frac{\partial^2 \log L(\lambda_{bg}, \lambda_{burst})}{\partial {\lambda_{burst}}^2}
+    \end{pmatrix} \\
+    &= \begin{pmatrix}
+        \frac{\partial^2 \log L(\lambda_{bg}, \lambda_{burst})}{\partial {\lambda_{bg}}^2} & 0 \\
+        0 & \frac{\partial^2 \log L(\lambda_{bg}, \lambda_{burst})}{\partial {\lambda_{burst}}^2}
+    \end{pmatrix} \\
+    &= \begin{pmatrix}
+        \sum_{i:t_i < t_{start} \text{ or } t_i > t_{end}}^{} -c_i \cdot \frac{1}{\lambda_{bg}^2} & 0 \\
+        0 & \sum_{i:t_{start} \leq t_i \leq t_{end}}^{} -c_i \cdot \frac{1}{\lambda_{burst}^2}
+    \end{pmatrix}\;. 
+\end{align*}
+
+Both gradient descent and Newton's method converge to the same solution, namely 
+\begin{align*}
+    \lambda_{bg} &= 1.955720 \\
+    \lambda_{burst} &= 3.046511\;.
+\end{align*}
+
+% As finding a closed formula for the maximum likelihood estimator of $\lambda$, we use Newton's method to find values for $\lambda$ where the derivatives are zero.
+
+% To this end, also compute the second derivatives:
+
+% \begin{align*}
+%     \frac{\partial^2 \log L(\lambda_{bg}, \lambda_{burst})}{\partial {(\lambda_{bg})}^2} &= \sum_{i:t_i < t_{start} \text{ or } t_i > t_{end}}^{} c_i\cdot(c_i-1)\cdot\lambda_{bg}^{c_i-2} \\
+%     &= \sum_{i:t_i < t_{start} \text{ or } t_i > t_{end}}^{} c_i^2\cdot(-c_i)\cdot\lambda_{bg}^{c_i-2} \\
+%     \frac{\partial^2 \log L(\lambda_{bg}, \lambda_{burst})}{\partial {(\lambda_{burst})}^2} &= \sum_{i:t_{start} \leq t_i \leq t_{end}}^{} c_i \cdot (c_i-1) \cdot \lambda_{burst}^{c_i-2} \\
+%     &= \sum_{i:t_{start} \leq t_i \leq t_{end}}^{} c_i^2 \cdot (-c_i) \cdot \lambda_{burst}^{c_i-2} \\
+%     \frac{\partial^2 \log L(\lambda_{bg}, \lambda_{burst})}{\partial \lambda_{burst} \cdot \lambda_{bg}} &= 0\;.
+% \end{align*}
+% Thus, the Hessian of $\log L(\lambda_{bg}, \lambda_{burst})$ is 
+% \begin{equation*}
+%     H = \begin{pmatrix}
+%         \sum_{i:t_i < t_{start} \text{ or } t_i > t_{end}}^{} c_i^2\cdot(-c_i)\cdot\lambda_{bg}^{c_i-2} & 0 \\
+%         0 & \sum_{i:t_{start} \leq t_i \leq t_{end}}^{} c_i^2 \cdot (-c_i) \cdot \lambda_{burst}^{c_i-2}
+%     \end{pmatrix}
+% \end{equation*}
+
+
+
+% \begin{align*}
+%     0 &= \sum_{i}^{} -1 + c_i \cdot \lambda^{c_i -1} \\
+%     0 &= -\sum_{i}^{} 1 + \sum_{i}^{} c_i \cdot \lambda^{c_i -1} \\
+%     \sum_{i}^{} 1 &= \sum_{i}^{} c_i \cdot \lambda^{c_i -1} 
+% \end{align*}
+
+
 
 \pagebreak
 \section*{Statement on the Useage of Gen. AI}
