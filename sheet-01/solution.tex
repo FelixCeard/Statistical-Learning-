@@ -586,7 +586,7 @@ model parameters as
 
 \begin{align*}
     L(\lambda_{bg}, \lambda_{burst}) &= \prod_{i}^{} P(c_i \mid \lambda_{bg} , \lambda_{burst}) \\
-    &= \prod_{i:t_i < t_{start} \text{ or } t_i > t_{end}}^{} \frac{\exp(-\lambda_{bg}) \cdot \lambda_{bg}^{c_i}}{c_i!} \cdot \prod_{i:t_{start} \leq t_i \leq t_{end}}^{} \frac{\exp(-\lambda_{burst}) \cdot \lambda_{burst}^{c_i}}{c_i!}
+    &= \prod_{i:t_i < t_{start} \text{ or } t_i > t_{end}}^{} \frac{\exp(-\lambda_{bg}) \cdot \lambda_{bg}^{c_i}}{c_i!} \cdot \prod_{i:t_{start} \leq t_i \leq t_{end}}^{} \frac{\exp(-\lambda_{burst}) \cdot \lambda_{burst}^{c_i}}{c_i!} \stepandtag \label{eq:likelihood_formula}
 \end{align*}
 where $c_i$ is the number of counts in bin $i$ starting at time $t_i$.
 
@@ -664,6 +664,47 @@ Both gradient descent and Newton's method converge to the same solution, namely
 %     \sum_{i}^{} 1 &= \sum_{i}^{} c_i \cdot \lambda^{c_i -1} 
 % \end{align*}
 
+\subsection*{(c)}
+
+We now investigate the null hypothesis that no burst happened, i.e., $\lambda_{bg} = \lambda_{burst} = \lambda$.
+To this end, we can simply replace $\lambda_{bg}$ and $\lambda_{burst}$ with $\lambda$ in Equation~\ref{eq:likelihood_formula}.
+We now have
+\begin{align*}
+    L(\lambda) &= \prod_{i:t_i < t_{start} \text{ or } t_i > t_{end}}^{} \frac{\exp(-\lambda) \cdot \lambda^{c_i}}{c_i!} \cdot \prod_{i:t_{start} \leq t_i \leq t_{end}}^{} \frac{\exp(-\lambda) \cdot \lambda^{c_i}}{c_i!} \\
+    &= \prod_{i=1}^{t_{end}} \frac{\exp(-\lambda) \cdot \lambda^{c_i}}{c_i!} \;.
+\end{align*}
+
+We now derive the maximum likelihood estimator for $\lambda$.
+\begin{align*}
+    \frac{\partial \log L(\lambda)}{\partial \lambda} &= \frac{\partial}{\partial \lambda} \sum_{i=1}^{t_{end}} -\lambda + c_i \cdot \log(\lambda) - \log(c_i!) \\
+    &= \sum_{i=1}^{t_{end}} -1 + c_i \cdot \frac{1}{\lambda}\;.
+\end{align*}
+
+Setting the gradient to zero, we get
+\begin{align*}
+    \sum_{i=1}^{t_{end}} -1 + c_i \cdot \frac{1}{\lambda} &\overset{!}{=} 0 \\
+    \sum_{i=1}^{t_{end}}  c_i \cdot \frac{1}{\lambda} &{=} \sum_{i=1}^{t_{end}} 1 \\
+    \frac{1}{\lambda} \cdot \sum_{i=1}^{t_{end}}  c_i &= t_{end} \\
+    \lambda &= \frac{\sum_{i=1}^{t_{end}}  c_i}{t_{end}} \;.
+\end{align*}
+
+And we can verify that it is a maximum by checking the second derivative:
+\begin{align*}
+    \frac{\partial^2 \log L(\lambda)}{\partial \lambda^2} &= \frac{\partial}{\partial \lambda} \sum_{i=1}^{t_{end}} -1 + c_i \cdot \frac{1}{\lambda} \\
+    &= \sum_{i=1}^{t_{end}} -c_i \cdot \frac{1}{\lambda^2} \\
+    &= -\frac{1}{\lambda^2} \cdot\sum_{i=1}^{t_{end}} c_i
+\end{align*}
+and by plugging the MLE into the second derivative, we get
+\begin{align*}
+    -\frac{1}{\lambda^2} \cdot\sum_{i=1}^{t_{end}} c_i &= -\frac{1}{\left( \frac{\sum_{i=1}^{t_{end}}  c_i}{t_{end}} \right)^2} \cdot\sum_{i=1}^{t_{end}} c_i \\
+    &= -\frac{1}{\frac{\left(\sum_{i=1}^{t_{end}}  c_i \right)^2}{t_{end}^2}} \cdot\sum_{i=1}^{t_{end}} c_i \\
+    &= -\frac{t_{end}^2}{\left(\sum_{i=1}^{t_{end}}  c_i \right)^2} \cdot\sum_{i=1}^{t_{end}} c_i \\
+    &= -\frac{t_{end}^2}{\sum_{i=1}^{t_{end}}  c_i } \\
+    &< 0\;.
+\end{align*}
+Therefore, the computed MLE is a maximum.
+
+We use python to compute the MLE for $\lambda$ for the given data and obtain a value of $\lambda = 2.3075$.
 
 
 \pagebreak
