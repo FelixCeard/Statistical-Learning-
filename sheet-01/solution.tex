@@ -602,6 +602,8 @@ We now derive the maximum likelihood estimate for the model parameters $\lambda_
 Which we can now use to compute the gradients w.r.t. to $\lambda$:
 \begin{align*}
     \frac{\partial \log L(\lambda_{bg}, \lambda_{burst})}{\partial \lambda_{bg}} &= \sum_{i:t_i < t_{start} \text{ or } t_i > t_{end}}^{} -1 + c_i \cdot \frac{1}{\lambda_{bg}} \\
+    % &= \sum_{i=1}^{t_{start}} -1 + c_i \cdot \frac{1}{\lambda_{bg}} + \sum_{i=t_{end}}^{T} -1 + c_i \cdot \frac{1}{\lambda_{bg}} \\
+    % &= - t_{start} + \frac{1}{\lambda_{bg}} \cdot \sum_{i=1}^{t_{start}} c_i - (T - t_{end}) + \sum_{i=t_{end}}^{T} c_i \cdot \frac{1}{\lambda_{bg}} \\
     \frac{\partial \log L(\lambda_{bg}, \lambda_{burst})}{\partial \lambda_{burst}} &= \sum_{i:t_{start} \leq t_i \leq t_{end}}^{} -1 + c_i \cdot \frac{1}{\lambda_{burst}} 
 \end{align*}
 thus
@@ -612,10 +614,21 @@ thus
     \end{pmatrix}\;.
 \end{equation*}
 
-We can now find the stationary points of the gradients. 
-% We observe that both derivatives are sums of $c_i \cdot \lambda^{c_i-1} - 1$. Therefore, we can set the gradient to zero by finding a value for $\lambda$ for which $c_i\cdot\lambda^{c_i-1}$ is centered around -1.
+We can derive the stationary points by setting the gradients to zero.
+\begin{align*}
+    \frac{\partial \log L(\lambda_{bg}, \lambda_{burst})}{\partial \lambda_{bg}} &\overset{!}{=} 0 \\
+    \sum_{i:t_i < t_{start} \text{ or } t_i > t_{end}}^{} -1 + c_i \cdot \frac{1}{\lambda_{bg}} &= 0 \\
+    \frac{1}{\lambda_{bg}} \cdot\sum_{i:t_i < t_{start} \text{ or } t_i > t_{end}}^{} c_i &= \sum_{i:t_i < t_{start} \text{ or } t_i > t_{end}}^{} 1 \\
+    \lambda_{bg} &= \frac{\sum_{i:t_i < t_{start} \text{ or } t_i > t_{end}}^{} c_i}{\sum_{i:t_i < t_{start} \text{ or } t_i > t_{end}}^{} 1}
+\end{align*}
+and analogously for $\lambda_{burst}$:
+\begin{align*}
+    \frac{\partial \log L(\lambda_{bg}, \lambda_{burst})}{\partial \lambda_{burst}} &\overset{!}{=} 0 \\
+    \lambda_{burst} &= \frac{\sum_{i:t_{start} \leq t_i \leq t_{end}}^{} c_i}{\sum_{i:t_{start} \leq t_i \leq t_{end}}^{} 1}\;.
+\end{align*}
+Therefore, the maximal likelihood estimator for both $\lambda_{bg}$ and $\lambda_{burst}$ are the mean of all the counts in the respective time intervals, as the denominator is the number of counts in the respective time interval, and the numerator is the sum of all the counts in the respective time interval.
 
-We use both gradient descent and Newton's method to find the stationary points for the MLE. For Newton's method, we compute the Hessian as follows:
+We verify that the stationary points are maxima by checking the second derivatives. We therefore compute the hessian matrix:
 \begin{align*}
     H &= \begin{pmatrix}
         \frac{\partial^2 \log L(\lambda_{bg}, \lambda_{burst})}{\partial {\lambda_{bg}}^2} & \frac{\partial^2 \log L(\lambda_{bg}, \lambda_{burst})}{\partial \lambda_{bg} \cdot \lambda_{burst}} \\
@@ -631,11 +644,24 @@ We use both gradient descent and Newton's method to find the stationary points f
     \end{pmatrix}\;. 
 \end{align*}
 
-Both gradient descent and Newton's method converge to the same solution, namely 
+We omit substituting the equation we previously derived for $\lambda_{bg}$ and $\lambda_{burst}$ into the second derivatives, as the values for the lambdas are positive, due to the the counts being positive integers, and therefore at the minimum zero, but never negative. It is easy to observe that $\frac{1}{\lambda_{bg}^2}$ will remain positive when substituting the equation we derived, and that $-c_i$ will always be negative or zero. By multiplying and summing up all the terms, we know that the second derivatives are either negative or zero, depending on the observed values. Thus, the derived equations for $\lambda_{bg}$ and $\lambda_{burst}$ are indeed maxima.
+
+
+
+
+% We can now find the stationary points of the gradients. 
+% We observe that both derivatives are sums of $c_i \cdot \lambda^{c_i-1} - 1$. Therefore, we can set the gradient to zero by finding a value for $\lambda$ for which $c_i\cdot\lambda^{c_i-1}$ is centered around -1.
+
+% We use both gradient descent and Newton's method to find the stationary points for the MLE. For Newton's method, we compute the Hessian as follows:
+
+
+% Both gradient descent and Newton's method converge to the same solution, namely 
+Finally, the computed values for $\lambda_{bg}$, $\lambda_{burst}$ using the closed form solution are
 \begin{align*}
-    \lambda_{bg} &= 1.955720 \\
-    \lambda_{burst} &= 3.046511\;.
+    \lambda_{bg} &= 1.955719557195572 \\
+    \lambda_{burst} &= 3.046511627906977\;.
 \end{align*}
+Note that gradient descent and Newton's method converge to the same stationary points.
 
 % As finding a closed formula for the maximum likelihood estimator of $\lambda$, we use Newton's method to find values for $\lambda$ where the derivatives are zero.
 
@@ -671,35 +697,36 @@ To this end, we can simply replace $\lambda_{bg}$ and $\lambda_{burst}$ with $\l
 We now have
 \begin{align*}
     L(\lambda) &= \prod_{i:t_i < t_{start} \text{ or } t_i > t_{end}}^{} \frac{\exp(-\lambda) \cdot \lambda^{c_i}}{c_i!} \cdot \prod_{i:t_{start} \leq t_i \leq t_{end}}^{} \frac{\exp(-\lambda) \cdot \lambda^{c_i}}{c_i!} \\
-    &= \prod_{i=1}^{t_{end}} \frac{\exp(-\lambda) \cdot \lambda^{c_i}}{c_i!} \;.
+    &= \prod_{i=1}^{T} \frac{\exp(-\lambda) \cdot \lambda^{c_i}}{c_i!} 
 \end{align*}
+where $T$ denotes the total number of timesteps observed.
 
 We now derive the maximum likelihood estimator for $\lambda$.
 \begin{align*}
-    \frac{\partial \log L(\lambda)}{\partial \lambda} &= \frac{\partial}{\partial \lambda} \sum_{i=1}^{t_{end}} -\lambda + c_i \cdot \log(\lambda) - \log(c_i!) \\
-    &= \sum_{i=1}^{t_{end}} -1 + c_i \cdot \frac{1}{\lambda}\;.
+    \frac{\partial \log L(\lambda)}{\partial \lambda} &= \frac{\partial}{\partial \lambda} \sum_{i=1}^{T} -\lambda + c_i \cdot \log(\lambda) - \log(c_i!) \\
+    &= \sum_{i=1}^{T} -1 + c_i \cdot \frac{1}{\lambda}\;.
 \end{align*}
 
 Setting the gradient to zero, we get
 \begin{align*}
-    \sum_{i=1}^{t_{end}} -1 + c_i \cdot \frac{1}{\lambda} &\overset{!}{=} 0 \\
-    \sum_{i=1}^{t_{end}}  c_i \cdot \frac{1}{\lambda} &{=} \sum_{i=1}^{t_{end}} 1 \\
-    \frac{1}{\lambda} \cdot \sum_{i=1}^{t_{end}}  c_i &= t_{end} \\
-    \lambda &= \frac{\sum_{i=1}^{t_{end}}  c_i}{t_{end}} \;.
+    \sum_{i=1}^{T} -1 + c_i \cdot \frac{1}{\lambda} &\overset{!}{=} 0 \\
+    \sum_{i=1}^{T}  c_i \cdot \frac{1}{\lambda} &{=} \sum_{i=1}^{T} 1 \\
+    \frac{1}{\lambda} \cdot \sum_{i=1}^{T}  c_i &= T \\
+    \lambda &= \frac{\sum_{i=1}^{T}  c_i}{T} \;.
 \end{align*}
 
 And we can verify that it is a maximum by checking the second derivative:
 \begin{align*}
-    \frac{\partial^2 \log L(\lambda)}{\partial \lambda^2} &= \frac{\partial}{\partial \lambda} \sum_{i=1}^{t_{end}} -1 + c_i \cdot \frac{1}{\lambda} \\
-    &= \sum_{i=1}^{t_{end}} -c_i \cdot \frac{1}{\lambda^2} \\
-    &= -\frac{1}{\lambda^2} \cdot\sum_{i=1}^{t_{end}} c_i
+    \frac{\partial^2 \log L(\lambda)}{\partial \lambda^2} &= \frac{\partial}{\partial \lambda} \sum_{i=1}^{T} -1 + c_i \cdot \frac{1}{\lambda} \\
+    &= \sum_{i=1}^{T} -c_i \cdot \frac{1}{\lambda^2} \\
+    &= -\frac{1}{\lambda^2} \cdot\sum_{i=1}^{T} c_i
 \end{align*}
 and by plugging the MLE into the second derivative, we get
 \begin{align*}
-    -\frac{1}{\lambda^2} \cdot\sum_{i=1}^{t_{end}} c_i &= -\frac{1}{\left( \frac{\sum_{i=1}^{t_{end}}  c_i}{t_{end}} \right)^2} \cdot\sum_{i=1}^{t_{end}} c_i \\
-    &= -\frac{1}{\frac{\left(\sum_{i=1}^{t_{end}}  c_i \right)^2}{t_{end}^2}} \cdot\sum_{i=1}^{t_{end}} c_i \\
-    &= -\frac{t_{end}^2}{\left(\sum_{i=1}^{t_{end}}  c_i \right)^2} \cdot\sum_{i=1}^{t_{end}} c_i \\
-    &= -\frac{t_{end}^2}{\sum_{i=1}^{t_{end}}  c_i } \\
+    -\frac{1}{\lambda^2} \cdot\sum_{i=1}^{T} c_i &= -\frac{1}{\left( \frac{\sum_{i=1}^{T}  c_i}{T} \right)^2} \cdot\sum_{i=1}^{T} c_i \\
+    &= -\frac{1}{\frac{\left(\sum_{i=1}^{T}  c_i \right)^2}{T^2}} \cdot\sum_{i=1}^{T} c_i \\
+    &= -\frac{T^2}{\left(\sum_{i=1}^{T}  c_i \right)^2} \cdot\sum_{i=1}^{T} c_i \\
+    &= -\frac{T^2}{\sum_{i=1}^{T}  c_i } \\
     &< 0\;.
 \end{align*}
 Therefore, the computed MLE is a maximum.
