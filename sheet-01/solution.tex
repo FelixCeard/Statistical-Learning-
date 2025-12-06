@@ -9,6 +9,11 @@
 \usepackage{amsmath}
 \usepackage{amssymb}
 \usepackage[utf8]{inputenc}
+\usepackage{todonotes}
+
+\usepackage{kantlipsum}
+% \usepackage{showframe}
+
 \newcommand*\dif{\mathop{}\mathrm{d}}
 \newcommand{\stepandtag}{%
   \refstepcounter{equation}%
@@ -35,7 +40,7 @@ We first compute the expectation of $X_i$. We have
     &= \int_{0}^{1} x \cdot p(X=x) \dif x \\
     &= \int_{0}^{1} x \cdot \frac{1}{1-0} \dif x \\
     &= \int_{0}^{1} x \dif x \\
-    &= \left[ \frac{1}{2} x^{2} \right]_0^1 \\
+    &= {\left[ \frac{1}{2} x^{2} \right]}_0^1 \\
     &= \frac{1}{2} (1^2 - 0^2) \\
     &= \frac{1}{2} \stepandtag \label{eq:expected_X_i}
 \end{align*}
@@ -57,15 +62,18 @@ Therefore, the expected value of $\mathbb{E}[ \bar{X}(N)]$ estimates the true me
 \textit{Find the $\text{Var}(\bar{X}(N))$ analytically. Hint: find the variance of a
 single $X_i$ first.}
 
+{
+\allowdisplaybreaks
 Let us first compute the exectation of $\mathbb{E}[X_i^2]$:
 \begin{align*}
     \mathbb{E}[X_i^2] &= \int_{0}^{1} x^2 \cdot p(X=x) \; \dif x \\
     &= \int_{0}^{1} x^2 \cdot {\frac{1}{1-0}} \; \dif x \\
     &= \int_{0}^{1} x^2\; \dif x \\
-    &= \left[ \frac{1}{3}\cdot x^3 \right]_0^1 \\
+    &= {\left[ \frac{1}{3}\cdot x^3 \right]}_0^1 \\
     &= \frac{1}{3}(1 - 0)\\ 
     &= \frac{1}{3} \stepandtag \label{eq:expectation_X_i_square}
 \end{align*}
+}
 
 We can now compute the variance of a $X_i$ as follows:
 \begin{align*}
@@ -74,12 +82,15 @@ We can now compute the variance of a $X_i$ as follows:
     &= \mathbb{E}\left[ X_i^2 + \frac{1^2}{2^2} - 2\cdot X_i \cdot \frac{1}{2} \right] \\
     &= \mathbb{E}\left[ X_i^2 + \frac{1^2}{2^2} - X_i \right] \\
     &= \mathbb{E}\left[ X_i^2 \right] + \mathbb{E}\left[\frac{1}{4} \right] - \mathbb{E} \left[X_i \right] \\
-    &= \mathbb{E}\left[ X_i^2 \right] + \frac{1}{4} - \frac{1}{2} \\
+    % &= \mathbb{E}\left[ X_i^2 \right] + \frac{1}{4} - \frac{1}{2} \\
     &\overset{(\ref{eq:expectation_X_i_square})}{=} \frac{1}{3} + \frac{1}{4} - \frac{1}{2} \\
     &= \frac{4}{12} + \frac{3}{12} - \frac{6}{12} \\
     &= \frac{1}{12} \; .
 \end{align*}
 
+
+{
+\allowdisplaybreaks 
 We can now compute the variance of $\bar{X}(N)$ as follows:
 \begin{align*}
     \var(\bar{X}(N)) &= \var \left( \frac{1}{N} \sum_{i=1}^N X_i \right) \\
@@ -89,11 +100,11 @@ We can now compute the variance of $\bar{X}(N)$ as follows:
     &= \frac{1}{N^2} \cdot N \cdot \frac{1}{12} \\
     &= \frac{1}{N} \cdot \frac{1}{12}
 \end{align*}
-where Equation~\ref{eq:iid_assumption} holds as each drawing $X_i$ is independent of each other drawing $X_j$ ($\Pr(X_i \mid X_j) = \Pr(X_i)$), and we can therefore use the property of the variance for i.i.d. variables $\var(X+Y) = \var(X) + \var(Y)$. 
+}where Equation~\ref{eq:iid_assumption} holds as each drawing $X_i$ is independent of each other drawing $X_j$ (i.e., for each $i \neq j$, $\Pr(X_i \mid X_j) = \Pr(X_i)$), therefore we can use the property of the variance for i.i.d.\ variables $X, Y$ with $\var(X+Y) = \var(X) + \var(Y)$. 
 
 Therefore, in the limit, we have
 \begin{equation*}
-    \lim_{n\rightarrow \infty} \var(\bar(X)(N)) = \lim_{n\rightarrow \infty} \frac{1}{N} \cdot \frac{1}{12} = 0
+    \lim_{n\rightarrow \infty} \var(\bar{X}(N)) = \lim_{n\rightarrow \infty} \frac{1}{N} \cdot \frac{1}{12} = 0
 \end{equation*}
 with a linear convergence rate.
 
@@ -103,6 +114,8 @@ The probability density function of $\hat{X}(N)$ is given as
 \begin{equation*}
     f_{\hat{X}(N)}(x) = \binom{N}{\frac{N-1}{2}} \cdot \frac{N+1}{2} \cdot x^{\frac{N-1}{2}} \cdot (1-x)^{\frac{N-1}{2}} \;. 
 \end{equation*}
+{
+\allowdisplaybreaks
 
 Let us now compute the expectation of $\hat{X}(N)$:
 \begin{align*}
@@ -178,7 +191,7 @@ Let us now compute the expectation of $\hat{X}(N)$:
     &= \frac{1}{ \left( \frac{N+1}{2} \right)!} \cdot \frac{1}{2} \cdot \frac{\left( \frac{N+1}{2} \right)!}{1} \stepandtag \label{eq:another_derivation} \\
     &= \frac{1}{2}
 \end{align*}
-where we used the given known integral rule to obtain Equation~\ref{eq:given_integral_result}, and Equation~\ref{eq:another_derivation} results from 
+where we used the given known integral rule to obtain Equation~\ref{eq:given_integral_result}. Equation~\ref{eq:another_derivation} results from the following:
 \begin{align*}
     N - \frac{N-1}{2} &= \frac{2 N}{2} - \frac{N-1}{2} \\
     &= \frac{N + N - (N-1)}{2} \\
@@ -214,12 +227,11 @@ We compute the expectation of $\hat{X}(N)^2$:
     &= \frac{1}{2} \cdot \frac{N+3}{(N+2) \cdot 2} \\
     &= \frac{1}{2} \cdot \frac{N+2 + 1}{(N+2) \cdot 2} \\
     &= \frac{1}{2} \cdot \left( \frac{N+2}{(N+2) \cdot 2} + \frac{1}{(N+2) \cdot 2}  \right) \\
-\end{align*}
-
-\begin{align*}
     &= \frac{1}{2} \cdot \left( \frac{1}{2} + \frac{1}{2N+4}  \right) \\
     &= \frac{1}{4} + \frac{1}{4N+8} \\
 \end{align*}
+}
+
      
 We can finally compute the variance of $\hat{X}(N)$ as follows:
 \begin{align*}
@@ -234,7 +246,8 @@ which, in the limit, converges to zero:
     \lim_{N\rightarrow \infty} \var(\hat{X}(N)) = \lim_{N\rightarrow \infty} \frac{1}{4N+8} = 0
 \end{align*}
 
-As the convergence rate of $\var(\hat{X}(N))$ is slower than $\var(\bar{X}(N))$, and that both have the same (correct) expectation, we can conclude that $\bar{X}(N)$ has the better variance, i.e., it is better to estimate the mean of a uniform distribution by using the mean of the samples instead of the median.
+% \todo[inline]{I think the conclusion is not correct.}
+As the convergence rate of $\var(\hat{X}(N))$ is slower than $\var(\bar{X}(N))$ (because $\var(\hat{X}(N)) \propto \frac{1}{4N}$ whereas $\var(\bar{X}(N)) \propto \frac{1}{12 \cdot N}$), and that both have the same (correct) expectation, we can conclude that $\bar{X}(N)$ has the better variance, i.e., it is better to estimate the mean of a uniform distribution by using the mean of the samples instead of the median.
 
 \subsection*{(e)}
 See provided code.
@@ -250,17 +263,19 @@ Let $\pi$ be the stationary distribution of the Markov chain, and
     E = \pi_0 \cdot (B1_+ - B1_-) + (\pi_1 + \pi_2) \cdot (B2_+ - B2_-) \;.
 \end{equation*}
 
-We remark that $E$ is composed of two sums, the first sum (which includes $\pi_0$) denotes the expected return when in state $0$. As $\pi$ is the stationary distribution, the state $0$ is reached with $\pi_0$ probability at each time step in the long run. The $(B1_+ - B1_-)$ part is positive if probability of gaining one dollar is greater than losing one dollar when playing game $B$ while in state $0$.\!\footnote{See the definition of the states in (b).}
+We remark that $E$ is composed of two sums, the first sum (which includes $\pi_0$) denotes the expected return when in state $0$. As $\pi$ is the stationary distribution, the state $0$ is reached with $\pi_0$ probability at each time step in the long run. The $(B1_+ - B1_-)$ part is positive if probability of gaining one dollar is greater than losing one dollar when playing game $B$ while in state $0$.\!\footnote{See the definition of the states in (b).} Therefore, this term denotes the expected \textit{gain} when playing game $B$ while in state $0$.
 
 Because the second part of the equation follows the same structure (one could multiply out $(\pi_1 + \pi_2)$ to obtain the same argument for the two remaning states of the Markov chain), we can conclude that $E$ denotes the expected \emph{gain} (or \emph{return}) when playing game B in the long run.
 
-Therefore, if the expected gain is negative, the game is losing in the long run. On the other hand, a positive expected gain would imply that the game is winning.
+Therefore, if the expected gain is negative, the game is losing in the long run. On the other hand, a positive expected gain would imply that the game is winning in the long run.
 
 
 
 \subsection*{(b)}
+\textit{Compute the stationary distribution $\pi$ and the value of ${E}$ to show that the game B is losing in a long run.}
 
-We three states in our Markov chain: $0$, $1$, and $2$, which denotes the number that results from the current capital modulo 3.
+
+We have three states in our Markov chain: $0$, $1$, and $2$, which denote the number that results from the current capital of the player modulo 3.
 We now define the transition matrix $P$ as follows:
 \begin{equation*}
     P = \begin{pmatrix}
@@ -270,7 +285,7 @@ We now define the transition matrix $P$ as follows:
     \end{pmatrix}
 \end{equation*}
 
-We remark that each play results in a win or a loss, and therefore a probability of $0.0$ to stay in the same state after playing a round, hence, the diagonal elements of $P$ are all $0.0$.
+We remark that each play results in either a win or a loss. Therefore, there is a probability of $0.0$ to stay in the same state after playing a round. Hence, the diagonal elements of $P$ are all $0.0$.
 
 The stationary distribution of the Markov chain is denoted as 
 \begin{equation*}
@@ -310,11 +325,11 @@ Using the fact that $\pi_0 + \pi_1 + \pi_2 = 1$, we can now compute $\pi_2$:
     \pi_2 &= \frac{1}{2.1639978479} \\
     \pi_2&= 0.4621076684
 \end{align*}
-from which we can infer 
+from which we can infer $\pi_1$ from Equation~\ref{eq:pi_1}:
 \begin{align*}
     \pi_1 &= \pi_2 \cdot  0.333862827 \\ &= 0.4621076684 \cdot 0.333862827 \\ &= 0.1542805726
 \end{align*}
-and
+and $\pi_0$ from Equation~\ref{eq:pi_0}:
 \begin{align*}
     \pi_0 &= \pi_1 \cdot 0.255 + \pi_2 \cdot 0.745 \\
     &= 0.1542805726 \cdot 0.255 + 0.4621076684 \cdot 0.745 \\
@@ -339,13 +354,17 @@ Therefore, the expected gain when playing game B in the long run is
     &= 0.383611759 \cdot (-0.81) + (0.1542805726 + 0.4621076684) \cdot 0.49 \\
     &= 0.383611759 \cdot (-0.81) + 0.616388241 \cdot 0.49 \\
     % &= 0.383611759 \cdot (0.095 - 0.905) + (0.1542805726 + 0.4621076684) \cdot (0.745 - 0.255) \\
-    &= -0.0086952867
+    &= -0.0086952867\;,
 \end{align*}
+which indicates that the game is losing in the long run.
 
 \subsection*{(c)}
+\textit{Use Monte Carlo simulation to numerically validate that the game B is losing in a long run.}
+
 See provided code.
 
 \subsection*{(d)}
+\textit{Construct the Markov chain for the random game. Compute its stationary distribution to see that it is winning in a long run.}
 
 % We extend the Markov chain of (b) by adding three extra states: $3, 4$, and $5$, which denotes again the current capital module 3. We introduce the three new states for representing the states of game A, whereas the current three states ($0, 1, 2$) represent the states of game B.
 We first observe that we can keep the same three states of the Markov chain as introduced in (b). However, we need to update the transition matrix $P$.
@@ -413,7 +432,8 @@ Therefore, we can now compute the expected gain when playing the new game by fir
     C_+ = 0.62 \\
     C_- = 0.38
 \end{gather*}
-and can finally compute the expected gain of the new Markov chain as follows:\!\footnote{We could also summarize Equation~\ref{eq:new_formular} by clusting $\pi_1$ and $\pi_2$ into a single term as done in the assignment sheet. However, the formulation in Equation~\ref{eq:new_formular} makes the derivation more transparent.}
+which we can directly read from the transition matrix $P$.\!\footnote{We could also compute the probabilities of winning and losing from each of the games separately. For example, $A_+ = 0.5 \cdot A_+^{(A)} + 0.5 \cdot A_+^{(B)}$ where $A_+^{(X)}$ denotes the probability of winning one dollar when playing game $X$ while being in state $0$.}
+We can finally compute the expected gain of the new Markov chain as follows:\!\footnote{We could also summarize Equation~\ref{eq:new_formular} by clusting $\pi_1$ and $\pi_2$ into a single term as done in the assignment sheet. However, the formulation in Equation~\ref{eq:new_formular} makes the derivation more transparent.}
 \begin{align*}
     E &= \pi_0 \cdot (A_+ - A_-) + \pi_1 \cdot (B_+ - B_-) + \pi_2 \cdot (C_+ - C_-) \stepandtag \label{eq:new_formular} \\
     &= \pi_0 \cdot (0.295 - 0.705) + \pi_1 \cdot (0.62 - 0.38) + \pi_2 \cdot (0.62 - 0.38) \\
@@ -424,6 +444,8 @@ and can finally compute the expected gain of the new Markov chain as follows:\!\
 Therefore, the expected gain when playing the new game is positive, indicating that, on average, the player will win in the long run.
 
 \subsection*{(e)}
+\textit{Confirm the result of (d) using Monte Carlo simulation.}
+
 See provided code.
 
 \subsection*{(f)}
@@ -474,6 +496,8 @@ and
     \pi_1 &= \pi_2 \cdot 0.455523525 \;.
 \end{align*}
 
+{
+\allowdisplaybreaks
 Therefore, we have 
 \begin{align*}
     1 &= \pi_0 + \pi_1 + \pi_2 \\
@@ -496,6 +520,7 @@ and
     &= 0.1743405141 \cdot 0.5558791638 + 0.3827255994 \cdot 0.9040984655 \\
     &= 0.4429338863\;.
 \end{align*}
+}
 
 Lastly, we compute the expected gain when playing this repeating pattern in the long run.
 As $P$ now represents three rounds instead of one, we need to compute the values for $A_-, A_+, \dots$.
@@ -566,6 +591,7 @@ To total expected reward for playing all three rounds can be computed as follows
 this shows that playing all three rounds in this specific order yields a positive expected reward, and therefore is winning in the long run.
 
 
+\vspace{3em}
 % Finally, we compute the probability of each state after playing the second round of game B:
 \textit{(Optional)}\\
 We can verify that $\pi^{(AB)}$ is valid by computing the probability of each state after the second round of game B: 
@@ -580,7 +606,17 @@ We remark that $\pi^{(ABB)} = \pi$, which is expected, as we just computed $\pi 
 \pagebreak
 \section*{Problem 4}
 
+\subsection*{(a)}
+\textit{Use any algorithm of your choice to estimate the $t_{start}$ and $t_{end}$. Plot the data and visually verify that your estimates are correct.}
+
+I tested two different algorithms, one based on the shift of the phase of the Fourier transform, and one based on Baysian denoising, which is a popular general denoising algorithm.
+
+The provided code contains both the details of the implementation and the results.
+
+
 \subsection*{(b)}
+\textit{Find the MLE estimates for $\lambda_{bg}$ and $\lambda_{burst}$ analytically or numerically.}
+
 We got given the following formula for the likelihood of observing counts with selected
 model parameters as
 
@@ -595,11 +631,10 @@ We now derive the maximum likelihood estimate for the model parameters $\lambda_
     \log L(\lambda_{bg}, \lambda_{burst}) &= \sum_{i:t_i < t_{start} \text{ or } t_i > t_{end}}^{} \log \left( \frac{\exp(-\lambda_{bg})\cdot \lambda_{bg}^{c_i}}{c_i!} \right) + \sum_{i:t_{start} \leq t_i \leq t_{end}}^{} \log \left( \frac{\exp(-\lambda_{burst})\cdot \lambda_{burst}^{c_i}}{c_i!} \right) \\
     &= \sum_{i:t_i < t_{start} \text{ or } t_i > t_{end}}^{} \log \left( {\exp(-\lambda_{bg})\cdot \lambda_{bg}^{c_i}} \right) - \log \left( c_i! \right) + \sum_{i:t_{start} \leq t_i \leq t_{end}}^{} \log \left( {\exp(-\lambda_{burst})\cdot \lambda_{burst}^{c_i}} \right) - \log \left( c_i! \right) \\
     % &= \sum_{i:t_i < t_{start} \text{ or } t_i > t_{end}}^{} -\lambda_{bg} + \lambda_{bg}^{c_i} - \log \left( c_i! \right) + \sum_{i:t_{start} \leq t_i \leq t_{end}}^{} -\lambda_{burst} + \lambda_{burst}^{c_i} - \log \left( c_i! \right)
-    &= \sum_{i:t_i < t_{start} \text{ or } t_i > t_{end}}^{} -\lambda_{bg} + c_i\cdot\log(\lambda_{bg}) - \log \left( c_i! \right) + \sum_{i:t_{start} \leq t_i \leq t_{end}}^{} -\lambda_{burst} + c_i\cdot\log(\lambda_{burst}) - \log \left( c_i! \right) \\
+    &= \sum_{i:t_i < t_{start} \text{ or } t_i > t_{end}}^{} -\lambda_{bg} + c_i\cdot\log(\lambda_{bg}) - \log \left( c_i! \right) + \sum_{i:t_{start} \leq t_i \leq t_{end}}^{} -\lambda_{burst} + c_i\cdot\log(\lambda_{burst}) - \log \left( c_i! \right) 
     % &= \sum_{i:t_i < t_{start} \text{ or } t_i > t_{end}}^{} \lambda_{bg} \cdot(c_i - 1) - \log \left( c_i! \right) + \sum_{i:t_{start} \leq t_i \leq t_{end}}^{} \lambda_{burst}\cdot(c_i - 1) - \log \left( c_i! \right)
 \end{align*}
-
-Which we can now use to compute the gradients w.r.t. to $\lambda$:
+which we can now use to compute the gradients w.r.t. to $\lambda_{bg}$ and $\lambda_{burst}$:
 \begin{align*}
     \frac{\partial \log L(\lambda_{bg}, \lambda_{burst})}{\partial \lambda_{bg}} &= \sum_{i:t_i < t_{start} \text{ or } t_i > t_{end}}^{} -1 + c_i \cdot \frac{1}{\lambda_{bg}} \\
     % &= \sum_{i=1}^{t_{start}} -1 + c_i \cdot \frac{1}{\lambda_{bg}} + \sum_{i=t_{end}}^{T} -1 + c_i \cdot \frac{1}{\lambda_{bg}} \\
@@ -691,6 +726,7 @@ Note that gradient descent and Newton's method converge to the same stationary p
 % \end{align*}
 
 \subsection*{(c)}
+\textit{Under the null hypothesis, find the MLE estimate for $\lambda$.}
 
 We now investigate the null hypothesis that no burst happened, i.e., $\lambda_{bg} = \lambda_{burst} = \lambda$.
 To this end, we can simply replace $\lambda_{bg}$ and $\lambda_{burst}$ with $\lambda$ in Equation~\ref{eq:likelihood_formula}.
@@ -733,11 +769,29 @@ Therefore, the computed MLE is a maximum.
 
 We use python to compute the MLE for $\lambda$ for the given data and obtain a value of $\lambda = 2.3075$.
 
+\subsection*{(d)}
+\textit{Compute the value of the test statistic T for the provided dataset.}
+
+See provided code.
+
+\subsection*{(e)}
+\textit{Generate 1000 synthetic datasets under the null hypothesis using the MLE estimate $\hat{\lambda}$ from (c). For each dataset compute the test
+statistic T. Plot the histogram of the resulting test statistics.
+Which conclusion can you make about the presence of a burst in
+the original dataset?}
+
+See provided code.
 
 \pagebreak
 \section*{Statement on the Useage of Gen. AI}
 
-I used ChatGPT to help find literature on the properties of integration, differentiation. Otherwise, all code and text has been written entirely by me.
+Unless stated otherwise, all code, text, and math derivations have been entirely thought and written by me with no external help.
+
+I used ChatGPT to help find literature on the properties of integration, differentiation. 
+
+Furthermore, when researching for denoising algorithms, I used ChatGPT to get a general overview of the available general denoising algorithms. After finding the Bayesian denoising algorithm, I used Claude 4.5 Sonnet to write the code for the Bayesian denoising algorithm (based on existing code for Bayesian denoising implemented for 2D images). As the exact algorithm is not at the core of the assignment or the course, and that the results of both denoising methods are very similar, I believe that this usage is acceptable.
+
+
 
 
 \end{document}
