@@ -724,6 +724,34 @@ Note that gradient descent and Newton's method converge to the same stationary p
 %     0 &= -\sum_{i}^{} 1 + \sum_{i}^{} c_i \cdot \lambda^{c_i -1} \\
 %     \sum_{i}^{} 1 &= \sum_{i}^{} c_i \cdot \lambda^{c_i -1} 
 % \end{align*}
+\textit{(Optional)}
+We further compute the variance of the MLE estimates, as we will use it later for the statistical testing. 
+While it is not required for the assignment, I believe that it remains interesting to show.
+
+After some research
+\!\footnote{
+    \begin{itemize}
+        \item \url{https://math.arizona.edu/~jwatkins/n-mle.pdf}
+        \item \url{https://stats.stackexchange.com/questions/60596/estimate-the-variance-of-mle}
+        \item \url{https://en.wikipedia.org/wiki/Observed_information}
+    \end{itemize}
+}
+the variance of the MLE estimates are the inverse of the negative Hessian matrix of the log-likelihood estimation.
+Hence, using $H$, we compute the variance of the MLE estimates as follows:
+\begin{align*}
+    \var(\lambda_{bg}) &\geq -\frac{1}{\frac{\partial^2 \log L(\lambda_{bg}, \lambda_{burst})}{\partial {\lambda_{bg}}^2}} \\
+    &= -\frac{1}{-\sum_{i:t_i < t_{start} \text{ or } t_i > t_{end}}^{} c_i \cdot \frac{1}{\lambda_{bg}^2}} \\
+    &= \frac{1}{\frac{1}{\lambda_{bg}^2} \cdot \sum_{i:t_i < t_{start} \text{ or } t_i > t_{end}}^{} c_i} \\
+    &= \frac{\lambda_{bg}^2}{\sum_{i:t_i < t_{start} \text{ or } t_i > t_{end}}^{} c_i}\;.
+\end{align*}
+Analogously, we can use the same steps to derive the variance of the estimation of $\lambda_{burst}$:
+\begin{equation*}
+    \var(\lambda_{burst}) \geq \frac{\lambda_{burst}^2}{\sum_{i:t_{start} \leq t_i \leq t_{end}}^{} c_i}\;.
+\end{equation*}
+
+
+
+
 
 \subsection*{(c)}
 \textit{Under the null hypothesis, find the MLE estimate for $\lambda$.}
