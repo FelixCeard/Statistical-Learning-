@@ -1,0 +1,211 @@
+\documentclass{article}
+\usepackage{import}
+
+
+\title{Statisitcal Learning and Stochastic Processes \\Sheet 01 }
+\author{Felix Céard-Falkenberg\\7174020}
+
+\usepackage{homework} % See homework.sty %
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage[utf8]{inputenc}
+\usepackage{todonotes}
+
+\usepackage{kantlipsum}
+% \usepackage{showframe}
+
+\newcommand*\dif{\mathop{}\mathrm{d}}
+\newcommand{\stepandtag}{%
+  \refstepcounter{equation}%
+  \tag{\theequation}%
+}
+\newcommand{\var}{\ensuremath{\text{Var}}}
+\newcommand{\group}{\ensuremath{\text{Group}}}
+\newcommand{\piml}{\ensuremath{\pi_{ML}}}
+
+
+\begin{document}
+
+
+\section*{Problem 1}
+\subsection*{(a)}
+\textit{Express $P(X_i = 1)$ as a function of $a$ and $\pi$.}
+
+We have
+\begin{align*}
+    P(X_i = 1) &= P(X_i = 1, \group = A) + P(X_i=1, \group = B) \\
+    &= P(X_i = 1\mid \group = A) \cdot P(\group = A) + P(X_i=1 \mid \group = B) \cdot P(\group = B) \\
+    &= a \cdot P(\group = A) + (1-a) \cdot P(\group = B) \\
+    &= a \cdot \pi + (1-a) \cdot (1-\pi)\;.
+\end{align*}
+
+Naturally, we have that
+\begin{align*}
+    P(X_i = 0) &= P(X_i = 0, \group = A) + P(X_i=0, \group = B) \\
+    &= P(X_i = 0\mid \group = A) \cdot P(\group = A) + P(X_i=0 \mid \group = B) \cdot P(\group = B) \\
+    &= (1-a) \cdot P(\group = A) + a \cdot P(\group = B) \\
+    &= (1-a) \cdot \pi + a \cdot (1-\pi) \;.
+\end{align*}
+
+\textit{(Optional)}
+Because the random variable $X_i$ can only have 2 potential values, we can now easily check whether our expressions are correct as $P(X_i = 1) + P(X_i = 0) = 1$. We have
+\begin{align*}
+    P(X_i = 1) + P(X_i = 0) &= a \cdot \pi + (1-a) \cdot (1-\pi) + (1-a) \cdot \pi + a \cdot (1-\pi) \\
+    &= a \cdot \pi + (1-\pi) - a +\pi \cdot a + \pi - \pi \cdot a + a - \pi \cdot a \\
+    &= a \cdot \pi + 1-\pi + \pi - \pi \cdot a \\
+    &= 1\;.
+\end{align*}
+
+\subsection*{(b)}
+\textit{Give expressions for the joint probability of the observed data $X_1, X_2, \dots , X_n$, and the corresponding likelihood function and loglikelihood function.}
+
+We aim to express the computation for
+\begin{equation*}
+    P(X_1, X_2, \dots, X_n)\;.
+\end{equation*}
+
+Because we know that the $n$ samples are drawn with the i.i.d.\ assumption, it holds that
+\begin{equation*}
+    P(X_1, X_2, \dots, X_n) = \prod_{i=1}^{n} P(X_i)\;.
+\end{equation*}
+Hence,
+\begin{align*}
+    P(X_1, X_2, \dots, X_n) &= \prod_{i=1}^{n} P(X_i) \\
+    &= \prod_{i=1}^{n} \begin{cases}
+        P(X_i=1) & \text{if } X_i = 1 \\
+        P(X_i = 0) & \text{if } X_i = 0
+    \end{cases} \\
+    &= {P(X_i=1)}^{m} \cdot {P(X_i=0)}^{n-m} \\
+    &= {\left ( a \cdot \pi + (1-a) \cdot (1-\pi) \right )}^{m} \cdot {\left ( (1-a) \cdot \pi + a \cdot (1-\pi) \right )}^{n-m} \\
+    % &= {\left ( a^m \cdot \pi^m + (1-a)^m \cdot (1-\pi)^m \right )} \cdot {\left ( (1-a)^{m} \cdot \pi^{m} + a^{m} \cdot (1-\pi)^{m} \right )} \\
+\end{align*}
+which is the likelihood function of the observed samples.
+
+Let us now derive the experession for the log likelihood of the data:
+\begin{align*}
+    \log P(X_1, X_2, \dots, X_n) &= \log \left [ {\left ( a \cdot \pi + (1-a) \cdot (1-\pi) \right )}^{m} \cdot {\left ( (1-a) \cdot \pi + a \cdot (1-\pi) \right )}^{n-m}\right ] \\
+    &= m \cdot \log {\left [ a \cdot \pi + (1-a) \cdot (1-\pi) \right ]} + (n - m) \cdot \log \left [ (1-a) \cdot \pi + a \cdot (1-\pi) \right ] \stepandtag \label{eq:log_likelihood_problem_1}
+\end{align*}
+
+
+\subsection*{(c)}
+\textit{Derive an expression for the maximum likelihood estimator $\pi_{ML}$ of $\pi$.}
+
+
+We now aim to estimate $\pi$. To this end, we replace $\pi$ with $\pi_{ML}$ in Equation~\ref{eq:log_likelihood_problem_1} and derive the log likelihood w.r.t. $\pi_{ML}$. We have
+\begin{align*}
+    &\frac{\partial}{\partial \pi_{ML}} \log P(X_1, X_2, \dots, X_n) \\
+    =& \frac{\partial}{\partial \pi_{ML}} m \cdot \log {\left [ a \cdot \pi_{ML} + (1-a) \cdot (1-\pi_{ML}) \right ]} + (n - m) \cdot \log \left [ (1-a) \cdot \pi_{ML} + a \cdot (1-\pi_{ML}) \right ] \\
+    =& m \cdot \frac{1}{a \cdot \pi_{ML} + (1-a) \cdot (1-\pi_{ML})} \cdot (a - (1-a))
+    % =&
+    + (n - m) \cdot \frac{1}{(1-a) \cdot \pi_{ML} + a \cdot (1-\pi_{ML})} \cdot ((1-a) - a)\;.
+\end{align*}
+
+We can now find the critical points by setting the gradient to zero:
+\begin{align*}
+    \frac{\partial}{\partial \pi_{ML}} \log P(X_1, X_2, \dots, X_n) &\overset{!}{=} 0 \\
+    m \cdot \frac{1}{a \cdot \pi_{ML} + (1-a) \cdot (1-\pi_{ML})} \cdot (a - (1-a))
+    + (n - m) \cdot \frac{1}{(1-a) \cdot \piml + a \cdot (1-\piml)} \cdot ((1-a) - a) &= 0 \stepandtag \label{eq:first_critical_point}
+\end{align*}
+where we observe that the the equation holds whenever $(1-a) = a$, because then both additive terms are zero. It is easy to see that $a=0.5$ is the only real valued solution for this condition. However, as we are interested in the maximum likelihood estimator of $\pi_{ML}$, setting $a=0.5$ prohibits us from finding the maximum value.
+\todo[inline]{Explain why setting $a=0.5$ is problematic in more details...}
+
+Therefore, we have to consider the case where $a\neq 0.5$.
+
+\begin{align*}
+    m \cdot \frac{1}{a \cdot \pi_{ML} + (1-a) \cdot (1-\pi_{ML})} \cdot (a - (1-a))
+    &= -(n - m) \cdot \frac{1}{(1-a) \cdot \pi_{ML} + a \cdot (1-\pi_{ML})} \cdot ((1-a) - a) \\
+    m \cdot \frac{1}{a \cdot \pi_{ML} + (1-a) \cdot (1-\pi_{ML})} \cdot (a - (1-a))
+    &= (n - m) \cdot \frac{1}{(1-a) \cdot \pi_{ML} + a \cdot (1-\pi_{ML})} \cdot (a - (1-a)) \\
+    m \cdot \frac{1}{a \cdot \pi_{ML} + (1-a) \cdot (1-\pi_{ML})}
+    &= (n - m) \cdot \frac{1}{(1-a) \cdot \pi_{ML} + a \cdot (1-\pi_{ML})} \\
+    m \cdot \frac{1}{(2a-1) \cdot \pi_{ML} + 1 - a} 
+    &= (n - m) \cdot \frac{1}{(1 - 2a) \cdot \piml + a} \\
+    m \cdot \frac{1}{(2a-1) \cdot \pi_{ML} + 1 - a}
+    &= (n - m) \cdot \frac{1}{a - (2a - 1) \cdot \piml} \\
+    m \cdot \left( a - (2a - 1) \cdot \piml \right) 
+    &= (n - m) \cdot \left( (2a-1) \cdot \piml + 1 - a \right)  \\
+    am - (2a -1)\cdot m \cdot \piml
+    &= (n - m) \cdot (2a-1) \cdot \piml + (n - m) \cdot(1 -a)  \\
+    am - (n - m) \cdot(1 -a)
+    &= (n - m) \cdot (2a-1) \cdot \piml + (2a -1)\cdot m \cdot \piml \\
+    am - (n - m) \cdot(1 -a)
+    &= \piml \cdot (2a -1) ((n - m) + m)  \\
+    am - (n - m) + a \cdot n - am
+    &= \piml \cdot (2a -1) (n)  \\
+    n \cdot (a - 1) + m
+    &= \piml \cdot (2a -1) (n)  \\
+    \frac{n \cdot (a - 1) + m}{(2a -1) (n)}
+    &= \piml \\
+    \frac{n \cdot (a - 1) + m}{n} \cdot \frac{1}{2a -1}
+    &= \piml \\
+    \left( a - 1 + \frac{m}{n} \right) \cdot \frac{1}{2a -1}
+    &= \piml \stepandtag \label{eq:ml_estimator_problem_1}
+\end{align*}
+
+We verify that this is indeed a maximum by plugging the result from Equation~\ref{eq:ml_estimator_problem_1} into the second derivative:
+\begin{align*}
+    &\frac{\partial^2}{\partial {\pi_{ML}}^2} \log P(X_1, X_2, \dots, X_n)\\
+    =& \frac{\partial}{\partial {\pi_{ML}}} m \cdot \frac{1}{a \cdot \pi_{ML} + (1-a) \cdot (1-\pi_{ML})} \cdot (a - (1-a))
+    + (n - m) \cdot \frac{1}{(1-a) \cdot \pi_{ML} + a \cdot (1-\pi_{ML})} \cdot ((1-a) - a) \\
+    =& m \cdot (a - (1-a)) \cdot \frac{1}{\left( a \cdot \pi_{ML} + (1-a) \cdot (1-\pi_{ML}) \right)^2} \cdot \left( a - (1-a) \right) \\
+    &+ (n - m) \cdot ((1-a) - a) \cdot \frac{1}{\left( (1-a) \cdot \pi_{ML} + a \cdot (1-\pi_{ML}) \right)^2} \cdot \left( (1-a) -a \right) \\
+    =& 2m \cdot (a - (1-a)) \cdot \frac{1}{\left( a \cdot \pi_{ML} + (1-a) \cdot (1-\pi_{ML}) \right)^2} + 2(n - m) \cdot ((1-a) - a) \cdot \frac{1}{\left( (1-a) \cdot \pi_{ML} + a \cdot (1-\pi_{ML}) \right)^2}
+\end{align*}
+% We see that for any value of $\piml$, the fraction will be positive as the denominator is squared. Moreover, we can distinguish between two cases: $a < 0.5$ and $a > 0.5$.
+% For $a<0.5$, we have
+% \begin{equation*}
+%     (a-(1-a)) < 0 \quad \land \quad ((1-a) - a) > 0\;.
+% \end{equation*}
+% Therefore, in order for the second derivative to be negative, we need to have $m > (n-m)$, i.e. $m > \frac{n}{2}$.
+
+% Similarly, for $a>0.5$, we have 
+% \begin{equation*}
+%     (a-(1-a)) > 0 \quad \land \quad ((1-a) - a) < 0\;.
+% \end{equation*}
+% Therefore, in order for the second derivative to be negative, we need to have $m < (n-m)$, i.e. $m < \frac{n}{2}$.
+
+\todo[inline]{This will be loooong I think...}
+
+
+
+
+
+\subsection*{(d)}
+\textit{Can you think of an easier way to arrive at the same estimator as the maximum likelihood estimator?}
+
+\subsection*{(e)}
+\textit{Show that $\piml$ is an unbiased estimator of $\pi$.}
+
+We aim to show that $\mathbb{E}[\piml] = \pi$.
+
+
+\subsection*{(f)}
+\textit{Derive an expression for the variance of $\piml$. Analyse its dependence on $a$.}
+
+
+\subsection*{(g)}
+\textit{Give an expression for the bias of this naive estimator. Is it asymptotically unbiased?}
+
+\subsection*{(h)}
+\textit{Derive expressions for the mean squared error (MSE) of the randomized response estimator and the naive estimator. Analyse the expressions to draw conclusions about when, depending on the relevant parameters $(\pi, a, \ell, n)$, one estimator should be favored over the other.}
+
+\pagebreak
+\section*{Problem 2}
+
+
+
+
+\pagebreak
+\section*{Statement on the Useage of Gen. AI}
+
+Unless stated otherwise, all code, text, and math derivations have been entirely thought and written by me with no external help --- both for gen. AI and wolframalpha anc co.
+
+% I used ChatGPT to help find literature on the properties of integration, differentiation.
+
+% Furthermore, when researching for denoising algorithms, I used ChatGPT to get a general overview of the available general denoising algorithms. After finding the Bayesian denoising algorithm, I used Claude 4.5 Sonnet to write the code for the Bayesian denoising algorithm (based on existing code for Bayesian denoising implemented for 2D images). As the exact algorithm is not at the core of the assignment or the course, and that the results of both denoising methods are very similar, I believe that this usage is acceptable.
+
+
+
+
+\end{document}
