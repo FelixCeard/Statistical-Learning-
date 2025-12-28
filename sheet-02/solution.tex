@@ -10,6 +10,9 @@
 \usepackage{amssymb}
 \usepackage[utf8]{inputenc}
 \usepackage{todonotes}
+\usepackage{multirow}
+\usepackage{multicol}
+\usepackage{booktabs}
 
 \usepackage{kantlipsum}
 % \usepackage{showframe}
@@ -22,6 +25,8 @@
 \newcommand{\var}{\ensuremath{\text{Var}}}
 \newcommand{\group}{\ensuremath{\text{Group}}}
 \newcommand{\piml}{\ensuremath{\pi_{ML}}}
+\newcommand{\variance}[1]{\ensuremath{\text{\small \textcolor{gray}{$\pm #1$}}}}
+% \newcommand{\variance}[1]{\text{\tiny\textcolor{gray}{$\pm$ #1}}}
 
 
 \begin{document}
@@ -193,6 +198,39 @@ We aim to show that $\mathbb{E}[\piml] = \pi$.
 \pagebreak
 \section*{Problem 2}
 
+\begin{table}[h]
+    \centering 
+    \begin{tabular}{c c|c c c}
+        \toprule
+        & & \multicolumn{1}{|c|}{$N=500$} & \multicolumn{1}{c|}{$N=1000$} & \multicolumn{1}{c}{$N=5000$} \\
+        \midrule
+        \multicolumn{2}{c|}{${\hat{N}}$} & $590.45 \variance{311}$ & $1096.62 \variance{286}$ & $5152.14\variance{583}$  \\
+        \multicolumn{2}{c|}{Error (\%)} & $18.09$ & $9.66$ & $3.04$ \\
+        % \hline
+        \multicolumn{2}{c|}{$\hat{\sigma}_{\hat{N}}$} & $239.58\variance{258}$ & $284.17\variance{116}$ & $566.36\variance{98}$\\
+        % \hline
+        \multirow{2}{*}{C.I.} & $\alpha = 0.05$ & $[299.68\variance{85}; 1322.77\variance{1298}]$ & $[687.34 \variance{137}; 1842.05\variance{609}]$ & $[4179.35\variance{423};6414.78	\variance{804}]$
+        \\
+        % 
+        & $\alpha = 0.01$ & $[250.36\variance{59}; 1740.30\variance{2079}]$ & $[601.62\variance{110}; 2185.30\variance{773}]$ & $[3922.46\variance{383}; 6884.52\variance{890}]$
+    \end{tabular}
+    \caption{Result from $1000$ MC simulations for estimating $\hat{N}$. For each value, we report on the mean (black) and standard deviation (gray). We omit the digits after the decimal point for the standard deviation for brevity.
+    The Error (\%) is the absolute difference between the estimated and the true value of $N$, divided by the true value of $N$. Hence, it measures the relative error of the estimated value to the true value.}
+    \label{tab:problem_2_results}
+\end{table}
+
+\textbf{Observation.}
+We implement the formulas and run the Monte-Carlo simulations for 1000 runs and report the results in Table~\ref{tab:problem_2_results}.
+We first observe that, although the absolute error between the estimated and the true value of $N$ increases with $N$, the relative error decreases when the true $N$ is larger.
+
+Interestingly, the given formula proposed for estimating the variance of $\hat{N}$ is very accurate, as its average value is very close to the computed variance of the Monte-Carlo simulation --- in our case, we report on the standard deviation, which is simply the square root of the variance.
+
+% However, we also observe a high standard deviation of the values returned by the proposed formula. While a variance of zero is not to be expected, we believe that the estimation of the variance is also noisy on its own, and need to be 
+
+Lastly, we computed the averaged confidence intervals across all runs for $\alpha=0.05$ and $\alpha=0.01$. Naturally, the confidence intervals when using $\alpha=0.01$ are larger than when using $\alpha=0.05$, we notice that the standard deviation of the lower confidence decreases when increasing the size of the Confidence Interval (C.I.), whereas the standard deviation of the upper-confidence increases when decreasing $\alpha$. 
+% As the upper- and lower-confidence use different formulas with different structure,  
+
+\textbf{Discussion.}
 
 
 
