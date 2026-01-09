@@ -16,6 +16,8 @@
 
 \usepackage{kantlipsum}
 % \usepackage{showframe}
+\usepackage[bottom]{footmisc}
+
 
 \newcommand*\dif{\mathop{}\mathrm{d}}
 \newcommand{\stepandtag}{%
@@ -81,8 +83,9 @@ Hence,
         P(X_i = 0) & \text{if } X_i = 0
     \end{cases} \\
     &= {P(X_i=1)}^{m} \cdot {P(X_i=0)}^{n-m} \\
-    &= {\left ( a \cdot \pi + (1-a) \cdot (1-\pi) \right )}^{m} \cdot {\left ( (1-a) \cdot \pi + a \cdot (1-\pi) \right )}^{n-m} \\
+    &= {\left ( a \cdot \pi + (1-a) \cdot (1-\pi) \right )}^{m} \cdot {\left ( (1-a) \cdot \pi + a \cdot (1-\pi) \right )}^{n-m} 
     % &= {\left ( a^m \cdot \pi^m + (1-a)^m \cdot (1-\pi)^m \right )} \cdot {\left ( (1-a)^{m} \cdot \pi^{m} + a^{m} \cdot (1-\pi)^{m} \right )} \\
+    \stepandtag \label{eq:likelihood_problem_1}
 \end{align*}
 which is the likelihood function of the observed samples.
 
@@ -179,14 +182,171 @@ We verify that this is indeed a maximum by plugging the result from Equation~\re
 \subsection*{(d)}
 \textit{Can you think of an easier way to arrive at the same estimator as the maximum likelihood estimator?}
 
+We observe that $X_i$ follows a Bernoulli distribution. We now first show that this holds. 
+
+Recall that the definition of a Bernoulli distribution is given by 
+\begin{align*}
+    P(X=1) &= p \\
+    P(X=0) &= 1-p \;.
+\end{align*}
+Therefore, we now aim to show that $P(X_i)$ follows a Bernoulli distribution. 
+From (a), we have that
+We have
+\begin{equation*}
+    P(X_i = 1) = a \cdot \pi + (1-a) \cdot (1-\pi)
+\end{equation*}
+and
+\begin{equation*}
+    P(X_i = 0) = (1-a) \cdot \pi + a \cdot (1-\pi) \;.
+\end{equation*}
+
+We multiply out the expression to get
+\begin{align*}
+    P(X_i = 1) &= a \cdot \pi + 1-\pi - a \cdot (1-\pi) \\
+    &= a \cdot \pi + 1-\pi - a + a \cdot \pi \\
+    &= 2a \cdot \pi + 1 - \pi - a \\ 
+    &= 1 + 2a \cdot \pi - \pi - a \stepandtag \label{eq:bernoulli_1} \\ 
+    P(X_i = 0) &= (1-a) \cdot \pi + a \cdot (1-\pi) \\
+    &= \pi - a \cdot \pi + a - a \cdot \pi  \\
+    &= -2a\cdot \pi + \pi + a \stepandtag \label{eq:bernoulli_2}\;.
+\end{align*}
+
+Therefore, with $p = 1 + 2a \cdot \pi - \pi - a$ (from Equation~\ref{eq:bernoulli_1}), we have
+\begin{align*}
+    P(X=0) 
+    &= 1 - p \\
+    &= 1 - P(X=1) \\
+    &= 1 - (1 + 2a \cdot \pi - \pi - a) \\
+    &= 1 - 1 - 2a \cdot \pi + \pi + a \\
+    &= - 2a \cdot \pi + \pi + a \stepandtag \label{eq:bernoulli_3}
+\end{align*}
+where Equation~\ref{eq:bernoulli_3} matches the expression in Equation~\ref{eq:bernoulli_2}.
+Therefore, we have shown that $X_i$ follows a Bernoulli distribution with parameter $p = 1 + 2a \cdot \pi - \pi - a$.
+
+Following from this result, because the random variable $m$ is the sum of $n$ i.i.d.\ Bernoulli random variables, we know that $m$ follows a Binomial distribution with parameters $n$ and $p$.
+Hence, the likelihood of observing $m$ ones in $n$ samples is given by the probability density function of the Binomial distribution:
+\begin{equation}
+    \Pr(X=m) = \binom{n}{m} p^m (1-p)^{n-m} \label{eq:binomial_likelihood}\;.
+\end{equation}
+While Equation~\ref{eq:binomial_likelihood} differs from the likelihood function we derived in Equation~\ref{eq:likelihood_problem_1}, we can see that the $\binom{n}{m}$ term cancels out when deriving the log likelihood; First, the log likelihood transforms the multiplication into a sum with a log term, and then when deriving w.r.t. $\pi_{ML}$, the $\log \binom{n}{m}$ becomes zero and therefore disappears. Hence, we end up with the same expression for the log likelihood.
+
+As the Binomial distribution is well-known, we know that the maximum likelihood estimator of $p$ of the Binomial distribution is given by $p_{ML} = \frac{m}{n}$, which is the proportion of successes, i.e., the number of $X_i=1$ in $n$ samples.\!\footnote{See \url{https://en.wikipedia.org/wiki/Binomial_distribution\#Estimation_of_parameters}.}
+
+Finally, to derive the maximum likelihood estimator of $\pi_{ML}$, we equate $p_{ML}$ and $P(X_i=1)$ (as $P(X_i=1) = p$), and then solve for $\pi_{ML}$:
+\begin{align*}
+    P(X_i=1) &= p_{ML} \\
+    1 + 2a \cdot \pi_{ML} - \pi_{ML} - a &= \frac{m}{n} \\
+    2a \cdot \pi_{ML} - \pi_{ML} &= \frac{m}{n} + a - 1 \\
+    \pi_{ML} \cdot (2a -1) &= \frac{m}{n} + a - 1 \\
+    \pi_{ML} &= \frac{\frac{m}{n} + a - 1}{(2a -1)} \stepandtag \label{eq:ml_estimator_problem_1_alternative}\;.
+\end{align*}
+We clearly observe that Equation~\ref{eq:ml_estimator_problem_1_alternative} matches Equation~\ref{eq:ml_estimator_problem_1}, hence, we found the same maximum likelihood estimator of $\pi_{ML}$ as in (c).
+
+
 \subsection*{(e)}
 \textit{Show that $\piml$ is an unbiased estimator of $\pi$.}
 
 We aim to show that $\mathbb{E}[\piml] = \pi$.
+To this end, we will make use of the knowledge introduced in (d), namely that $X_i$ follows a Bernoulli distribution.
 
+We have 
+% \begin{align*}
+%     % \mathbb{E}_{\pi_{ML}}[m] &= n \cdot \mathbb{E}_{\pi_{ML}}[X_i]
+%     \mathbb{E} \left[ \pi_{ML} \right] &= \mathbb{E} \left[ \frac{\frac{m}{n} + a - 1}{(2a -1)} \right] \\
+%     &= \mathbb{E} \left[ \frac{\frac{\sum_{i=1}^{n} X_i}{n} + a - 1}{(2a -1)} \right] \\
+%     &= \frac{1}{(2a -1)} \cdot \mathbb{E} \left[ \frac{\sum_{i=1}^{n} X_i}{n} + a - 1 \right] \\
+%     &= \frac{a - 1}{(2a -1)} \cdot \mathbb{E} \left[ \frac{\sum_{i=1}^{n} X_i}{n} \right] \\
+%     &= \frac{a - 1}{(2a -1) \cdot n} \cdot \mathbb{E} \left[ \sum_{i=1}^{n} X_i \right] \\
+%     &= \frac{a - 1}{(2a -1) \cdot n} \cdot \left( \sum_{i=1}^{n} \mathbb{E}[X_i] \right) \stepandtag \label{eq:expectation_x_i}\;.
+% \end{align*}
+\begin{align*}
+    % \mathbb{E}_{\pi_{ML}}[m] &= n \cdot \mathbb{E}_{\pi_{ML}}[X_i]
+    \mathbb{E} \left[ \pi_{ML} \right] &= \mathbb{E} \left[ \frac{\frac{m}{n} + a - 1}{(2a -1)} \right] \\
+    &= \mathbb{E} \left[ \frac{\frac{\sum_{i=1}^{n} X_i}{n} + a - 1}{(2a -1)} \right] \\
+    &= \frac{\sum_{i=1}^{n} \mathbb{E}[ X_i] + a \cdot n - 1 \cdot n}{(2a -1) \cdot n} \stepandtag \label{eq:expectation_x_i}\;.
+\end{align*}
+We now compute the expectation of $X_i$:
+\begin{align*}
+    \mathbb{E}[X_i] &= P(X_i=1) \cdot 1 + P(X_i = 0) \cdot 0 \\
+    &= P(X_i=1) \\
+    &= a \cdot \pi + (1-a) \cdot (1-\pi) \\
+    &= (1-a) + (2a - 1) \cdot \pi \stepandtag \label{eq:expectation_x_i_2} \;.
+\end{align*}
+Finally, we can substitute Equation~\ref{eq:expectation_x_i_2} into Equation~\ref{eq:expectation_x_i} to get
+\begin{align*}
+    \mathbb{E} \left[ \pi_{ML} \right] &= \frac{\sum_{i=1}^{n} \mathbb{E}[ X_i] + a \cdot n - 1 \cdot n}{(2a -1) \cdot n} \\
+    &= \frac{\sum_{i=1}^{n} \left( (1-a) + (2a - 1) \cdot \pi \right) + a \cdot n - 1 \cdot n}{(2a -1) \cdot n} \\
+    &= \frac{ n \cdot \left( (1-a) + (2a - 1) \cdot \pi \right) + a \cdot n - 1 \cdot n}{(2a -1) \cdot n} \\
+    &= \frac{ \left( (1-a) + (2a - 1) \cdot \pi \right) + a - 1}{(2a -1)} \\
+    &= \frac{ -(a-1) + (2a - 1) \cdot \pi + (a - 1)}{(2a -1)} \\
+    &= \frac{ (2a - 1) \cdot \pi}{(2a -1)} \\
+    &= \pi \stepandtag \label{eq:expectation_pi_ml}\;.
+\end{align*}
+We have shown that the expected value of $\piml$ is equal to the true value of $\pi$ (Equation~\ref{eq:expectation_pi_ml}). Therefore, we can conclude that our estimator for $\pi_{ML}$ is unbiased.
 
 \subsection*{(f)}
 \textit{Derive an expression for the variance of $\piml$. Analyse its dependence on $a$.}
+
+We have
+\begin{align*}
+    \mathbb{V}[\pi_{ML}] &= \mathbb{V}\left[ \frac{\frac{m}{n} + a - 1}{(2a -1)} \right] \\
+    &= \mathbb{V}\left[ \frac{m}{n} + a - 1 \right] \cdot \frac{1}{{(2a-1)}^2} \\
+    &= \mathbb{V}\left[ \frac{1}{n} \left( m + a \cdot n - 1 \cdot n \right) \right] \cdot \frac{1}{{(2a-1)}^2} \\
+    &= \mathbb{V}\left[  m + a \cdot n - 1 \cdot n \right] \cdot \frac{1}{{(2a-1)}^2 \cdot n^2} \\
+    &= \mathbb{V}\left[  \sum_{i=1}^{n} X_i + a \cdot n - 1 \cdot n \right] \cdot \frac{1}{{(2a-1)}^2 \cdot n^2} \\
+    &= \mathbb{V}\left[  \sum_{i=1}^{n} X_i \right] \cdot \frac{1}{{(2a-1)}^2 \cdot n^2} \\
+    &= \sum_{i=1}^{n} \mathbb{V}\left[  X_i \right] \cdot \frac{1}{{(2a-1)}^2 \cdot n^2}\;.\stepandtag \label{eq:variance_pi_ml_1}
+\end{align*}
+We now compute the variance of $X_i$. We have:
+\begin{align*}
+    \mathbb{E}[X_i^2] &= P(X_i = 1) \cdot 1^2 + P(X_i = 0) \cdot 0 ^2 \\ 
+    &= P(X_i = 1) \\
+    &= (1-a) + (2a - 1) \cdot \pi\;,
+\end{align*}
+and
+\begin{align*}
+    {\mathbb{E}[X_i]}^2 &= {\left( (1-a) + (2a - 1) \cdot \pi  \right)}^2 \\
+    &= {(1-a)}^2 + {(2a - 1)}^2 \cdot \pi^2 + 2 \cdot (1-a) \cdot (2a - 1) \cdot \pi \\
+    &= 1^2+a^2 - 2a + 4a^2\pi^2 + \pi^2 - 4a \cdot \pi^2 + (2-2a) \cdot (2a - 1) \cdot \pi \\
+    &= 1+a^2 - 2a + 4a^2\pi^2 + \pi^2 - 4a \cdot \pi^2 + (4a - 2 - 4a^2 + 2a) \cdot \pi \\
+    % &= 1+a^2 - 2a + 4a^2\pi^2 + \pi^2 - 4a \cdot \pi^2 + 4a\pi - 2\pi - 4a^2\pi + 2a\pi \\
+    &= 1 + \pi \left(6a - 4a^2 - 2 \right) + \pi^2 (4 a^2 - 4 a + 1) - 2a + a^2\;.
+\end{align*}
+
+Therefore, the variance of $X_i$ is given by
+\begin{align*}
+    V(X_i) &= \mathbb{E}\left[ X_i^2 \right] - {E[X_i]}^2 \\
+    &= \pi (2a - 1) + 1 - a - \left( 1 + \pi \left(6a - 4a^2 - 2 \right) + \pi^2 (4 a^2 - 4 a + 1) - 2a + a^2 \right) \\
+    &= \pi (2a - 1) + 1 - a -1 - \pi \left(6a - 4a^2 - 2 \right) - \pi^2 (4 a^2 - 4 a + 1) + 2a - a^2 \\
+    &= \pi (2a - 1) - \pi \left(6a - 4a^2 - 2 \right) - \pi^2 (4 a^2 - 4 a + 1) + a - a^2 \\
+    &= \pi \left(2a - 1 - (6a - 4a^2 - 2 )\right) - \pi^2 (4 a^2 - 4 a + 1) + a - a^2 \\
+    &= \pi \left(2a - 1 - 6a + 4a^2 + 2 \right) - \pi^2 (4 a^2 - 4 a + 1) + a - a^2 \\
+    &= \pi \left(1- 4a + 4a^2  \right) - \pi^2 (1 - 4a + 4 a^2) + a - a^2 \\
+    &= \left(1- 4a + 4a^2  \right) \cdot (\pi - \pi^2) + a - a^2 \;. \stepandtag \label{eq:variance_x_i}
+\end{align*}
+
+Finally, to compute the variance of the estimator of $\piml$, we plug Equation~\ref{eq:variance_x_i} into Equation~\ref{eq:variance_pi_ml_1} and get
+\begin{align*}
+    \mathbb{V}[\pi_{ML}] &= \sum_{i=1}^{n} \mathbb{V}\left[  X_i \right] \cdot \frac{1}{{(2a-1)}^2 \cdot n^2} \\
+    &= \sum_{i=1}^{n} \left( \left(1- 4a + 4a^2  \right) \cdot (\pi - \pi^2) + a - a^2 \right) \cdot \frac{1}{{(2a-1)}^2 \cdot n^2} \\
+    &= n \cdot \left( \left(1- 4a + 4a^2  \right) \cdot (\pi - \pi^2) + a - a^2 \right) \cdot \frac{1}{{(2a-1)}^2 \cdot n^2} \\
+    &= \left( \left(1- 4a + 4a^2  \right) \cdot (\pi - \pi^2) + a - a^2 \right) \cdot \frac{1}{{(2a-1)}^2 \cdot n} \\
+    &= \left( {\left(2a -1 \right)}^2 \cdot (\pi - \pi^2) + a - a^2 \right) \cdot \frac{1}{{(2a-1)}^2 \cdot n} \\
+    &= \frac{{\left(2a -1 \right)}^2 \cdot (\pi - \pi^2)}{{(2a-1)}^2 \cdot n} + \frac{a - a^2}{{(2a-1)}^2 \cdot n} \\
+    &= \frac{\pi - \pi^2}{n} + \frac{a - a^2}{{(2a-1)}^2 \cdot n} \;.
+\end{align*}
+
+We correctly observe that the variance is undefined for $a=0.5$. Furthermore, we observe that the variance decreases as $n$ increases, which is to be expected as we get more evidence with more data. 
+Lastly, we observe that whenever $a$ approaches either $0$ or $1$, the variance decreases. The same phenomenon is observed for the true value of $\pi$. 
+Figure~\ref{fig:variance_heatmap} shows the log-scaled variance of $\pi_{ML}$ as a function of $a$ and $\pi$, which clearly displays the behavior previously described.
+
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=\textwidth]{./heatmap.png}
+    \caption{Variance of $\pi_{ML}$ as function of $a$ and $\pi$ for different values of $n$. Here, the values are log-scaled for better display. Note that we restrict $a\in [0.01, 0.99]$ and $\pi\in [0.01, 0.99]$ for the plot. Hence, very low values are expected whenever $a$ or $\pi$ exceeds these bounds.}
+    \label{fig:variance_heatmap}
+\end{figure}
+
 
 
 \subsection*{(g)}
