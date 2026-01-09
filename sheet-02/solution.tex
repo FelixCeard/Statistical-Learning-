@@ -352,6 +352,53 @@ Figure~\ref{fig:variance_heatmap} shows the log-scaled variance of $\pi_{ML}$ as
 \subsection*{(g)}
 \textit{Give an expression for the bias of this naive estimator. Is it asymptotically unbiased?}
 
+We aim to recover the value of $\pi$ from direct questioning. 
+However, persons belonging to the sensitive group will lie with probability $\ell$, whereas persons belonging to the non-sensitive group will answer truthfully and therefore lie with probability $0$.
+
+Naivily, we could estimate the value of $\pi$ as the fraction of persons answering yes to the question:
+\begin{equation*}
+    \pi_{naive} = \frac{\sum_{i=1}^{n} X_i}{n}\;.
+\end{equation*}
+
+We can model the whether a person belongs to the sensitive group as a hidden variable $S_i \in \{0, 1\}$ with $S_i = 1$ describing that the person belongs to the sensitive group, and $S_i = 0$ describes that a person belongs to the non-sensitive group.
+
+Naturally, we have that 
+\begin{align*}
+    P(S_i = 1) &= \pi \\
+    P(S_i = 0) &= 1 - \pi
+\end{align*}
+which is distributed according to a Bernoulli distribution with parameter $p=\pi$.
+
+We can now express the probability of a person answering yes or no to the question by marginalizing over the hidden variable $S_i$:
+\begin{align*}
+    P(X_i = 1) &= P(X_i = 1, S_i = 1) + P(X_i = 1, S_i = 0) \\
+    &= \pi \cdot (1-\ell) + 0 \\
+    P(X_i = 0) &= P(X_i = 0, S_i = 1) + P(X_i = 0, S_i = 0) \\
+    &= \pi \cdot \ell + (1-\pi)\;.
+\end{align*}
+
+We verify that the probabilities are correct by adding both $P(X_i = 1)$ and $P(X_i = 0)$ and getting $1$:
+\begin{align*}
+    P(X_i = 1) + P(X_i = 0) &= \pi \cdot (1-\ell) + \pi \cdot \ell + (1-\pi) \\
+    &= \pi (1-\ell + \ell) + 1- \pi \\
+    &= \pi (1) + 1- \pi \\
+    &= 1\;.
+\end{align*}
+
+We now compute the expeced value of the naive estimator of $\pi$ to check whether the estimator is unbiased.
+We have
+\begin{align*}
+    \mathbb{E}[\pi_{naive}] &= \mathbb{E}\left[ \frac{\sum_{i=1}^{n} X_i}{n} \right] \\
+    &= \frac{1}{n} \cdot \sum_{i=1}^{n} \mathbb{E}[X_i] \\
+    &= \frac{1}{n} \cdot \sum_{i=1}^{n} \left( P(X_i = 1) \cdot 1 + P(X_i = 0) \cdot 0 \right) \\
+    &= \frac{1}{n} \cdot \sum_{i=1}^{n} \left( P(X_i = 1) \right) \\
+    &= \frac{1}{n} \cdot \sum_{i=1}^{n} \left( \pi \cdot (1-\ell) \right) \\
+    &= \frac{1}{n} \cdot n \left( \pi \cdot (1-\ell) \right) \\
+    &= \pi \cdot (1-\ell)\;.
+\end{align*}
+Therefore, the naive estimator of $\pi$ is only unbiased whenever $\ell = 0$. Otherwise, the estimator is biased towards 0 the more the persons of the sensitive group lie ($\lim_{\ell \rightarrow 1} \mathbb{E}[\pi_{naive}] = 0$).
+
+
 \subsection*{(h)}
 \textit{Derive expressions for the mean squared error (MSE) of the randomized response estimator and the naive estimator. Analyse the expressions to draw conclusions about when, depending on the relevant parameters $(\pi, a, \ell, n)$, one estimator should be favored over the other.}
 
