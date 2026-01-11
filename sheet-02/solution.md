@@ -5,6 +5,7 @@ $$P(X_i=1)=a\pi+(1-a)(1-\pi)=(1-a)+(2a-1)\pi.$$
 
 ### (b)
 Joint Probability : $\prod_{i=1}^{n} p^{x_i}(1-p)^{1-x_i}$
+
 Likelihood: $L(\pi)=\prod_{i=1}^n p(\pi)^{x_i}\,[1-p(\pi)]^{1-x_i}
       =[(1-a)+(2a-1)\pi]^m[a+(1-2a)\pi]^{n-m}$
 
@@ -12,6 +13,7 @@ Likelihood: $L(\pi)=\prod_{i=1}^n p(\pi)^{x_i}\,[1-p(\pi)]^{1-x_i}
 $X_i \sim Benouli(X) $, so MLE of $p$ is $\hat p = m/n$
 
 $(1-a)+(2a-1)\pi = m/n$
+
 $\hat \pi_{ML} = \frac{\frac{m}{n}-(1-a)}{2a-1},
 \qquad a\neq 0.5$
 

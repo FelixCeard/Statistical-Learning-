@@ -301,7 +301,7 @@ We now compute the variance of $X_i$. We have:
 \begin{align*}
     \mathbb{E}[X_i^2] &= P(X_i = 1) \cdot 1^2 + P(X_i = 0) \cdot 0 ^2 \\ 
     &= P(X_i = 1) \\
-    &= (1-a) + (2a - 1) \cdot \pi\;,
+    &= (1-a) + (2a - 1) \cdot \pi\;, \stepandtag \label{eq:expectation_complex_x_i_square_inside}
 \end{align*}
 and
 \begin{align*}
@@ -310,7 +310,7 @@ and
     &= 1^2+a^2 - 2a + 4a^2\pi^2 + \pi^2 - 4a \cdot \pi^2 + (2-2a) \cdot (2a - 1) \cdot \pi \\
     &= 1+a^2 - 2a + 4a^2\pi^2 + \pi^2 - 4a \cdot \pi^2 + (4a - 2 - 4a^2 + 2a) \cdot \pi \\
     % &= 1+a^2 - 2a + 4a^2\pi^2 + \pi^2 - 4a \cdot \pi^2 + 4a\pi - 2\pi - 4a^2\pi + 2a\pi \\
-    &= 1 + \pi \left(6a - 4a^2 - 2 \right) + \pi^2 (4 a^2 - 4 a + 1) - 2a + a^2\;.
+    &= 1 + \pi \left(6a - 4a^2 - 2 \right) + \pi^2 (4 a^2 - 4 a + 1) - 2a + a^2\;. \stepandtag \label{eq:expectation_complex_x_i_square_outside}
 \end{align*}
 
 Therefore, the variance of $X_i$ is given by
@@ -357,7 +357,7 @@ However, persons belonging to the sensitive group will lie with probability $\el
 
 Naivily, we could estimate the value of $\pi$ as the fraction of persons answering yes to the question:
 \begin{equation*}
-    \pi_{naive} = \frac{\sum_{i=1}^{n} X_i}{n}\;.
+    \pi_\text{naive} = \frac{\sum_{i=1}^{n} X_i}{n}\;.
 \end{equation*}
 
 We can model the whether a person belongs to the sensitive group as a hidden variable $S_i \in \{0, 1\}$ with $S_i = 1$ describing that the person belongs to the sensitive group, and $S_i = 0$ describes that a person belongs to the non-sensitive group.
@@ -388,19 +388,134 @@ We verify that the probabilities are correct by adding both $P(X_i = 1)$ and $P(
 We now compute the expeced value of the naive estimator of $\pi$ to check whether the estimator is unbiased.
 We have
 \begin{align*}
-    \mathbb{E}[\pi_{naive}] &= \mathbb{E}\left[ \frac{\sum_{i=1}^{n} X_i}{n} \right] \\
+    \mathbb{E}[\pi_\text{naive}] &= \mathbb{E}\left[ \frac{\sum_{i=1}^{n} X_i}{n} \right] \\
     &= \frac{1}{n} \cdot \sum_{i=1}^{n} \mathbb{E}[X_i] \\
     &= \frac{1}{n} \cdot \sum_{i=1}^{n} \left( P(X_i = 1) \cdot 1 + P(X_i = 0) \cdot 0 \right) \\
     &= \frac{1}{n} \cdot \sum_{i=1}^{n} \left( P(X_i = 1) \right) \\
     &= \frac{1}{n} \cdot \sum_{i=1}^{n} \left( \pi \cdot (1-\ell) \right) \\
     &= \frac{1}{n} \cdot n \left( \pi \cdot (1-\ell) \right) \\
-    &= \pi \cdot (1-\ell)\;.
+    &= \pi \cdot (1-\ell)\;. \stepandtag \label{eq:naive_expected_value}
 \end{align*}
-Therefore, the naive estimator of $\pi$ is only unbiased whenever $\ell = 0$. Otherwise, the estimator is biased towards 0 the more the persons of the sensitive group lie ($\lim_{\ell \rightarrow 1} \mathbb{E}[\pi_{naive}] = 0$).
+Therefore, the naive estimator of $\pi$ is only unbiased whenever $\ell = 0$. Otherwise, the estimator is biased towards 0 the more the persons of the sensitive group lie ($\lim_{\ell \rightarrow 1} \mathbb{E}[\pi_\text{naive}] = 0$).
 
 
 \subsection*{(h)}
 \textit{Derive expressions for the mean squared error (MSE) of the randomized response estimator and the naive estimator. Analyse the expressions to draw conclusions about when, depending on the relevant parameters $(\pi, a, \ell, n)$, one estimator should be favored over the other.}
+
+We aim to compute the mean squared error of our two estimators of $\pi$.
+
+% \begin{align*}
+%     \text{MSE}(\pi_{\text{naive}}) &= \mathbb{E}\left[ {\left( \pi_{\text{naive}} - \pi \right)}^2 \right] \\
+%     &= \mathbb{E} \left[ \pi_{\text{naive}}^2 + \pi^2 - 2\pi_{\text{naive}} \pi \right] \\
+%     &= \mathbb{E} \left[ \pi_{\text{naive}}^2  \right] + \mathbb{E} \left[ \pi^2  \right] - \mathbb{E} \left[ 2\pi_{\text{naive}} \pi  \right] \\
+%     &= \mathbb{E}\left[ {\left( \frac{\sum_{i=1}^{n} X_i}{n} \right)}^2 \right] + \pi^2 - 2 \pi \mathbb{E}\left[ \pi_{\text{naive}} \right] \\
+%     &\overset{(\ref{eq:naive_expected_value})}{=} \mathbb{E}\left[ {\left( \frac{\sum_{i=1}^{n} X_i}{n} \right)}^2 \right] + \pi^2 - 2 \pi \left( \pi \cdot (1-\ell) \right) \\
+%     &= \mathbb{E}\left[ {\left( \frac{\sum_{i=1}^{n} X_i}{n} \right)}^2 \right] + \pi^2 - 2 \pi^2 (1-\ell) \\
+%     &= \mathbb{E}\left[ X_i \right]^2 + \pi^2 - 2 \pi^2 (1-\ell) \stepandtag \label{eq:mse_iid_assumption} \\
+% \end{align*}
+We use the Bias Variance trade off to decompose the MSE into the bias and variance terms.\!\footnote{See \url{https://en.wikipedia.org/wiki/Mean_squared_error\#Proof_of_variance_and_bias_relationship}.}
+Therefore, we simplify the MSE into 
+\begin{align*}
+    \text{MSE}(\hat{\pi}, \pi) &= \mathbb{E}\left[ {\left( \hat{\pi} - \mathbb{E}[\hat{\pi}] \right)}^2 \right] + {\left[ \mathbb{E}[\hat{\pi}] - \pi \right]}^2 \\
+    &= \mathbb{V}\left[ \hat{\pi} \right] + {\left[ \mathbb{E}[\hat{\pi}] - \pi \right]}^2\
+\end{align*}
+Therefore, we have
+% \begin{align*}
+%     \text{MSE}(\pi_{\text{naive}}, \pi) &= \mathbb{E}\left[ {\left( \mathbb{E}[\pi_{\text{naive}}] - \pi \right)}^2 \right] + {\left[ \mathbb{E}[\pi_{\text{naive}}] - \pi \right]}^2 \\
+%     &= \mathbb{E}\left[ \mathbb{E}{[\pi_{\text{naive}}]}^2 + \pi^2 - 2\pi\mathbb{E}[\pi_{\text{naive}}]  \right] + {\left[ \mathbb{E}[\pi_{\text{naive}}] - \pi \right]}^2 \\
+%     &= \mathbb{E}{[\pi_{\text{naive}}]}^2 + \mathbb{E}\left[ \pi^2  \right] - \mathbb{E}\left[ 2\pi\mathbb{E}[\pi_{\text{naive}}]  \right] + {\left[ \mathbb{E}[\pi_{\text{naive}}] - \pi \right]}^2 \\
+%     &= \mathbb{E}{[\pi_{\text{naive}}]}^2 + \mathbb{E}\left[ \pi^2  \right] - 2\pi \mathbb{E}[\pi_{\text{naive}}] + {\left[ \mathbb{E}[\pi_{\text{naive}}] - \pi \right]}^2 \\
+%     &\overset{(\ref{eq:naive_expected_value})}{=} {\left( \pi \cdot (1-\ell) \right)}^2 + \pi^2 - 2\pi \left( \pi \cdot (1-\ell) \right) + {\left[ \left( \pi \cdot (1-\ell) \right) - \pi \right]}^2 \\
+%     &={\left( \pi \cdot (1-\ell) \right)}^2  + \pi^2 - 2\pi^2 \cdot (1-\ell) + {\left( \pi \cdot (1-\ell) \right)}^2 + \pi^2 - 2\pi\left( \pi \cdot (1-\ell) \right) \\
+%     &= {\left( \pi \cdot (1-\ell) \right)}^2  + \pi^2 - 2\pi^2 \cdot (1-\ell) + {\left( \pi \cdot (1-\ell) \right)}^2 + \pi^2 - 2\pi^2 \cdot (1-\ell) \\
+%     &= 2\pi^2 - 4\pi^2 \cdot (1-\ell) + 2{\left( \pi \cdot (1-\ell) \right)}^2  \\
+%     &= 2\pi^2 - 4\pi^2 \cdot (1-\ell) + 2\pi^2 \cdot {(1-\ell)}^2  \\
+%     &= 2\pi^2 \left( {(1-\ell)}^2 - 2(1-\ell) + 1 \right)  \\
+%     &= 2\pi^2 \left( 1^2 + \ell^2 - 2\ell - 2 + 2\ell + 1 \right)  \\
+%     &= 2\pi^2 \ell^2 
+% \end{align*}
+Let us first compute $\mathbb{E}[\pi_\text{naive}^2]$ and ${\mathbb{E}[\pi_\text{naive}]}^2$.
+\begin{align*}
+    \mathbb{E}[\pi_\text{naive}^2] &= \mathbb{E} \left[ {\left( \frac{\sum_{i=1}^{n} X_i}{n} \right)}^2 \right] \\
+    &= \mathbb{E} \left[ {\left( \frac{\sum_{i=1}^{n} X_i}{n} \right)}^2 \right] \\
+    &= \mathbb{E} \left[ {\left( \frac{1}{n} \cdot \sum_{i=1}^{n} X_i \right)}^2 \right] \\
+    &= \mathbb{E} \left[ \frac{1}{n^2} {\left( \sum_{i=1}^{n} X_i \right)}^2 \right] \\
+    &= \frac{1}{n^2} \mathbb{E} \left[ {\left( \sum_{i=1}^{n} X_i \right)}^2 \right] \\
+    &= \frac{1}{n^2} \mathbb{E} \left[ n \cdot \mathbb{E}[X_i \cdot X_i] + (n^2 - n) \cdot \mathbb{E}[X_i \cdot X_j] \right] \\
+    &= \frac{1}{n^2} \mathbb{E} \left[ n \cdot \mathbb{E}[X_i^2] + (n^2 - n) \cdot \left( \mathbb{E}[X_i] + \mathbb{E}[X_j] \right) \right] \\
+    &= \frac{1}{n^2} \mathbb{E} \left[ n \cdot \mathbb{E}[X_i^2] + (n^2 - n) \cdot {\mathbb{E}[X_i]}^2 \right] \\
+    &= \frac{1}{n} \mathbb{E}[X_i^2] + \frac{n^2 - n}{n^2} \cdot {\mathbb{E}[X_i]}^2  \\
+    &= \frac{1}{n} \mathbb{E}[X_i^2] + \left( 1 - \frac{1}{n} \right) \cdot {\mathbb{E}[X_i]}^2  \\
+    &= \frac{1}{n} \mathbb{E}[X_i^2] + \left( \frac{n-1}{n} \right) \cdot {\mathbb{E}[X_i]}^2 \\
+    &= \frac{1}{n} \left[ P(X_i = 1) \cdot 1^2 + P(X_i = 0) \cdot 0^2 \right] + \left( \frac{n-1}{n}\right) \cdot {\left( P(X_i = 1) \cdot 1 + P(X_i = 0) \cdot 0 \right)}^2 \\
+    &= \frac{1}{n} \left[ P(X_i = 1)\right] + \left( \frac{n-1}{n} \right) \cdot {\left( P(X_i = 1) \right)}^2 \\
+    &= \frac{1}{n} \left[ \pi \cdot (1- \ell)\right] + \left( \frac{n-1}{n} \right) \cdot {\left( \pi \cdot (1- \ell) \right)}^2 \\
+    &= \frac{\pi \cdot (1- \ell)}{n} + \left( \frac{n-1}{n} \right) \cdot  \pi^2 \cdot {(1- \ell)}^2 
+    % &= \frac{1}{n} \left( \pi \cdot (1- \ell) + \left( n-1 \right) \cdot  \pi^2 \cdot {(1- \ell)}^2 \right) 
+    \stepandtag \label{eq:expectation_naive_x_i_square_outside} 
+\end{align*}
+
+\begin{align*}
+    \mathbb{V}[\pi_{\text{naive}}] &= \mathbb{V}\left[ \frac{\sum_{i=1}^{n} X_i}{n} \right] \\
+    &= \frac{1}{n^2} \sum_{i=1}^{n} \mathbb{V}[X_i] \\
+    &= \frac{1}{n^2} \sum_{i=1}^{n} \mathbb{E}[X_i^2] - {\mathbb{E}[X_i]}^2 \\
+    &= \frac{1}{n^2} \sum_{i=1}^{n} \left[ P(X_i = 1) \right] - {\left( P(X_i = 1) \right)}^2 \\
+    &= \frac{1}{n^2} \sum_{i=1}^{n} (\pi \cdot (1-\ell)) - {(\pi \cdot (1-\ell))}^2 \\
+    &= \frac{n}{n^2} \left( (\pi \cdot (1-\ell)) - {(\pi \cdot (1-\ell))}^2 \right) \\
+    &= \frac{\pi \cdot (1-\ell) - \pi^2 \cdot {(1-\ell)}^2}{n} \stepandtag \label{eq:variance_naive_x_i}
+    % &= \frac{1}{n} \left( \pi \cdot (1-\ell) - \pi^2- \pi^2 \ell^2 \right) \\
+\end{align*}
+
+\begin{align*}
+    \text{MSE}(\pi_{\text{naive}}, \pi) &= \mathbb{V}[\pi_{\text{naive}}] + {\left[ \mathbb{E}[\pi_{\text{naive}}] - \pi \right]}^2 \\
+    &\overset{(\ref{eq:variance_naive_x_i})}{=} \frac{\pi \cdot (1-\ell) - \pi^2 \cdot {(1-\ell)}^2}{n} + {\left[ \mathbb{E}[\pi_{\text{naive}}] - \pi \right]}^2 \\
+    &= \frac{\pi \cdot (1-\ell) - \pi^2 \cdot {(1-\ell)}^2}{n} + {\mathbb{E}[\pi_{\text{naive}}]}^2 + \pi^2 - 2\pi \mathbb{E}\left[ \pi_{\text{naive}} \right] \\
+    &= \frac{\pi \cdot (1-\ell) - \pi^2 \cdot {(1-\ell)}^2}{n} + {\left( \pi \cdot (1-\ell) \right)}^2 + \pi^2 - 2\pi \pi \cdot (1-\ell) \\
+    &= \frac{\pi \cdot (1-\ell) - \pi^2 \cdot {(1-\ell)}^2}{n} + \pi^2 \cdot {(1-\ell)}^2 + \pi^2 - 2\pi^2 \cdot (1-\ell) \\
+\end{align*}
+% \begin{align*}
+%     \text{MSE}(\pi_{\text{naive}}, \pi) &= \mathbb{E}\left[ {\left( \pi_{\text{naive}} - \mathbb{E}[\pi_{\text{naive}}] \right)}^2 \right] + {\left[ \mathbb{E}[\pi_{\text{naive}}] - \pi_{\text{naive}} \right]}^2 \\
+%     &= \mathbb{E}\left[ \mathbb{E}{[\pi_{\text{naive}}]}^2 + \pi_{\text{naive}}^2 - 2\pi_{\text{naive}}\mathbb{E}[\pi_{\text{naive}}]  \right] + {\left[ \mathbb{E}[\pi_{\text{naive}}] - \pi \right]}^2 \\
+%     &= \mathbb{E}{[\pi_{\text{naive}}]}^2 + \mathbb{E}\left[ \pi_{\text{naive}}^2  \right] -   2\pi_{\text{naive}}\mathbb{E}[\pi_{\text{naive}}] + \mathbb{E}{[\pi_{\text{naive}}]}^2 + \pi^2 - 2\pi  \mathbb{E}[\pi_{\text{naive}}] \\
+%     % &= 2\mathbb{E}{[\pi_{\text{naive}}]}^2 + \mathbb{E}\left[ \pi_{\text{naive}}^2  \right] + \pi^2 - 4\pi  \mathbb{E}[\pi_{\text{naive}}] \\
+%     &= 2\mathbb{E}{[\pi_{\text{naive}}]}^2 + \mathbb{E}\left[ \pi_{\text{naive}}^2  \right] + \pi^2 + \mathbb{E}[\pi_{\text{naive}}]\cdot(2\pi - 2 \pi_{\text{naive}}) \\
+%     % &=  2\mathbb{E}{[\pi_{\text{naive}}]}^2 + \mathbb{E}\left[ \pi_{\text{naive}}^2  \right] + \pi^2 + \mathbb{E}[\pi_{\text{naive}}]\cdot(2\pi - 2 \pi_{\text{naive}}) \\
+%     &\overset{(\ref{eq:expectation_naive_x_i_square_outside})}{=}  2\mathbb{E}{[\pi_{\text{naive}}]}^2 + \frac{\pi \cdot (1- \ell)}{n} + \left( \frac{n-1}{n} \right) \cdot  \pi^2 \cdot {(1- \ell)}^2 + \pi^2 - \mathbb{E}[\pi_{\text{naive}}]\cdot(2\pi + 2 \pi_{\text{naive}}) \\
+%     % &\overset{(\ref{eq:expectation_naive_x_i_square_outside})}{=} 2\mathbb{E}{[\pi_{\text{naive}}]}^2 + \frac{\pi \cdot (1- \ell)}{n} + \left( \frac{n-1}{n} \right) \cdot  \pi^2 \cdot {(1- \ell)}^2 + \\
+%     &\overset{(\ref{eq:naive_expected_value})}{=} 2 {\left[ \pi \cdot (1-\ell) \right]}^2 + \frac{\pi \cdot (1- \ell)}{n} + \left( \frac{n-1}{n} \right) \cdot  \pi^2 \cdot {(1- \ell)}^2 + \pi^2 -\left( \pi \cdot (1-\ell) \right)\cdot(2\pi + 2 \pi_{\text{naive}}) \\
+%     &\overset{(\ref{eq:naive_expected_value})}{=} 2 {\left[ \pi \cdot (1-\ell) \right]}^2 + \frac{\pi \cdot (1- \ell)}{n} + \left( \frac{n-1}{n} \right) \cdot  \pi^2 \cdot {(1- \ell)}^2 + \pi^2 - \left( \pi \cdot (1-\ell) \right)\cdot(2\pi + 2 \pi_{\text{naive}}) \\
+%     &= 2 {\left[ \pi \cdot (1-\ell) \right]}^2 + \frac{\pi \cdot (1- \ell)}{n} + \left( \frac{n-1}{n} \right) \cdot  \pi^2 \cdot {(1- \ell)}^2 + \pi^2 - 2\pi \cdot (1-\ell) \cdot(\pi +  \pi_{\text{naive}}) \\
+%     &= 2 \pi^2 \cdot {(1-\ell)}^2 + \frac{\pi \cdot (1- \ell)}{n} + \left( \frac{n-1}{n} \right) \cdot  \pi^2 \cdot {(1- \ell)}^2 + \pi^2 - 2\pi \cdot (1-\ell) \cdot(\pi +  \pi_{\text{naive}}) \\
+%     &= \left( 1-\ell \right) \cdot \left( 2\pi^2 \cdot (1-\ell) + \frac{\pi}{n} + \left( \frac{n-1}{n} \right) \cdot  \pi^2 \cdot {(1- \ell)} - 2\pi (\pi +  \pi_{\text{naive}}) \right) \\
+%     &= \left( 1-\ell \right) \cdot \left( 2\pi^2 \cdot (1-\ell) + \frac{\pi}{n} + \left( \frac{n-1}{n} \right) \cdot  \pi^2 \cdot {(1- \ell)} - 2\pi^2 -  2\pi\pi_{\text{naive}} \right) \\
+%     &= \pi \cdot \left( 1-\ell \right) \cdot \left( 2\pi \cdot (1-\ell) + \frac{1}{n} + \left( \frac{n-1}{n} \right) \cdot  \pi \cdot {(1- \ell)} - 2\pi -  2\pi_{\text{naive}} \right) \\
+%     &= \pi \cdot \left( 1-\ell \right) \cdot \left( 2\pi -2\pi \ell + \frac{1}{n} + \left( \frac{n-1}{n} \right) \cdot  \pi \cdot {(1- \ell)} - 2\pi -  2\pi_{\text{naive}} \right) \\
+%     % &= 2 \pi^2 \cdot {(1-\ell)}^2 + \frac{\pi \cdot (1- \ell)}{n} + \left( \frac{n-1}{n} \right) \cdot  \pi^2 \cdot {(1- \ell)}^2 + \pi^2 + 2 \pi^2 \cdot (1-\ell) - 2 \pi_{\text{naive}} \pi \cdot (1-\ell) \\
+%     % &= \pi^2 \left( 2 \cdot {(1-\ell)}^2 + \left( \frac{n-1}{n} \right)\cdot {(1-\ell)}^2 + 1 + 2 \cdot (1-\ell)  \right) + \frac{\pi \cdot (1- \ell)}{n} - 2 \pi_{\text{naive}} \pi \cdot (1-\ell) \\
+%     % &= \pi^2 \left( 2- 2\ell^2 + \left( \frac{n-1}{n} \right) - \left( \frac{(n-1) \ell}{n} \right) + 1 + 2-2\ell  \right) + \frac{\pi \cdot (1- \ell)}{n} - 2 \pi_{\text{naive}} \pi \cdot (1-\ell) \\
+%     % &= \pi^2 \left( 5- 2\ell^2 + \left( \frac{n-1}{n} \right) - \left( \frac{(n-1) \ell}{n} \right) -2\ell  \right) + \frac{\pi \cdot (1- \ell)}{n} - 2 \pi_{\text{naive}} \pi \cdot (1-\ell) \\
+%     % % &= 2 \pi^2 \cdot {(1-\ell)}^2 + \frac{\pi \cdot (1- \ell)}{n} + \left( \frac{n-1}{n} \right) \cdot  \pi^2 \cdot {(1- \ell)}^2 + \pi^2 - 4\pi^2 \cdot (1-\ell) \\
+% \end{align*}
+
+% \pagebreak
+% We have
+% \todo[inline]{This is for the non-naive estimator.}
+% \begin{align*}
+%     \text{MSE}(\pi_\text{naive}) &= \mathbb{E}\left[ {(\pi_\text{naive} - \pi)}^2 \right] \\
+%     &= \mathbb{E} \left[ {\left( \frac{\sum_{i=1}^{n} X_i}{n} - \pi \right)}^2 \right] \\
+%     &= \mathbb{E} \left[ \frac{\sum_{i=1}^{n} X_i^2}{n^2} + \pi^2 - 2\pi\frac{\sum_{i=1}^{n} X_i}{n}  \right] \\
+%     &= \mathbb{E} \left[ \frac{\sum_{i=1}^{n} X_i^2}{n^2} \right] + \mathbb{E} \left[ \pi^2 \right] - \mathbb{E} \left[ 2\pi\frac{\sum_{i=1}^{n} X_i}{n} \right] \\
+%     &= \frac{1}{n^2} \sum_{i=1}^{n} \mathbb{E} \left[ X_i^2 \right] + \pi^2 - \frac{2 \pi}{n} \sum_{i=1}^{n} \mathbb{E}[X_i] \\
+%     &\overset{(\ref{eq:expectation_naive_x_i_square_inside})}{=} \frac{1}{n^2} \sum_{i=1}^{n} \left[ (1-a) + (2a - 1) \cdot \pi \right] + \pi^2 - \frac{2 \pi}{n} \sum_{i=1}^{n} \mathbb{E}[X_i] \\
+%     &= \frac{1}{n} \left[ (1-a) + (2a - 1) \cdot \pi \right] + \pi^2 - \frac{2 \pi}{n} \sum_{i=1}^{n} \mathbb{E}[X_i] \\
+%     &\overset{(\ref{eq:expectation_naive_x_i_square_outside})}{=} \frac{1}{n} \left[ (1-a) + (2a - 1) \cdot \pi \right] + \pi^2 - \frac{2 \pi}{n} \sum_{i=1}^{n} \left[ 1 + \pi \left(6a - 4a^2 - 2 \right) + \pi^2 (4 a^2 - 4 a + 1) - 2a + a^2 \right] \\
+%     &= \frac{1}{n} \left[ (1-a) + (2a - 1) \cdot \pi \right] + \pi^2 - 2 \pi \cdot \left[ 1 + \pi \left(6a - 4a^2 - 2 \right) + \pi^2 (4 a^2 - 4 a + 1) - 2a + a^2 \right] \\
+%     &= \frac{(1-a)}{n} + \frac{(2a - 1) \cdot \pi }{n}
+%      + \pi^2 - 2 \pi 
+%     - 2 \pi^2 \left(6a - 4a^2 - 2 \right) - 2 \pi^3 (4 a^2 - 4 a + 1) + 4 \pi a - 2 \pi a^2  \\
+%     &= \pi \left( \frac{2a -1}{n} - 2 + 4a - 2a^2 \right) + \pi^2 (1 - 12a + 4a^2 - 4) + \pi^3 ()
+% \end{align*}
+
 
 \pagebreak
 \section*{Problem 2}
