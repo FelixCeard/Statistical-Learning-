@@ -13,6 +13,10 @@
 \usepackage{multirow}
 \usepackage{multicol}
 \usepackage{booktabs}
+\usepackage{graphicx}
+\usepackage{float}
+\usepackage{subfig}
+% \usepackage{minipage}
 
 \usepackage{kantlipsum}
 % \usepackage{showframe}
@@ -160,12 +164,14 @@ For ease of notation, we will use $b = (1-a)$. We have
 \allowdisplaybreaks
 \begin{align*}
     &\frac{\partial^2}{\partial {\pi_{ML}}^2} \log P(X_1, X_2, \dots, X_n)\\
-    =\ & \frac{\partial}{\partial {\pi_{ML}}} m \cdot \frac{1}{a \cdot \pi_{ML} + (1-a) \cdot (1-\pi_{ML})} \cdot (a - (1-a))
-    + (n - m) \cdot \frac{1}{(1-a) \cdot \pi_{ML} + a \cdot (1-\pi_{ML})} \cdot ((1-a) - a) \\
+    =\ & \frac{\partial}{\partial {\pi_{ML}}} m \cdot (a - (1-a)) \cdot \frac{1}{a \cdot \pi_{ML} + (1-a) \cdot (1-\pi_{ML})}
+    + (n - m) \cdot ((1-a) - a) \cdot \frac{1}{(1-a) \cdot \pi_{ML} + a \cdot (1-\pi_{ML})} \\
     =\ & -m \cdot (a - (1-a)) \cdot \frac{1}{\left( a \cdot \pi_{ML} + (1-a) \cdot (1-\pi_{ML}) \right)^2} \cdot \left( a - (1-a) \right) \\
     &- (n - m) \cdot ((1-a) - a) \cdot \frac{1}{\left( (1-a) \cdot \pi_{ML} + a \cdot (1-\pi_{ML}) \right)^2} \cdot \left( (1-a) -a \right) \\
-    =\ & - m \cdot {(a - (1-a))}^2 \cdot \frac{1}{\left( a \cdot \pi_{ML} + (1-a) \cdot (1-\pi_{ML}) \right)^2} - (n - m) \cdot {((1-a) - a)}^2 \cdot \frac{1}{\left( (1-a) \cdot \pi_{ML} + a \cdot (1-\pi_{ML}) \right)^2} \\
-    =\ & -m \cdot {(a - b)}^2 \cdot \frac{1}{\left( a \cdot \pi_{ML} + b \cdot (1-\pi_{ML}) \right)^2} - (n - m) \cdot {(b - a)}^2 \cdot \frac{1}{\left( b \cdot \pi_{ML} + a \cdot (1-\pi_{ML}) \right)^2} \\
+    =\ & -m \cdot (a - (1-a)) \cdot \frac{1}{\left( a \cdot \pi_{ML} + (1-a) \cdot (1-\pi_{ML}) \right)^2} \cdot \left( a - (1-a) \right) \\
+    &- (n - m) \cdot (a-(1-a)) \cdot \frac{1}{\left( (1-a) \cdot \pi_{ML} + a \cdot (1-\pi_{ML}) \right)^2} \cdot \left( a - (1-a) \right) \\
+    =\ & - m \cdot {(a - (1-a))}^2 \cdot \frac{1}{\left( a \cdot \pi_{ML} + (1-a) \cdot (1-\pi_{ML}) \right)^2} - (n - m) \cdot {(a-(1-a))}^2 \cdot \frac{1}{\left( (1-a) \cdot \pi_{ML} + a \cdot (1-\pi_{ML}) \right)^2} \\
+    =\ & -m \cdot {(a - b)}^2 \cdot \frac{1}{\left( a \cdot \pi_{ML} + b \cdot (1-\pi_{ML}) \right)^2} - (n - m) \cdot {(a-b)}^2 \cdot \frac{1}{\left( b \cdot \pi_{ML} + a \cdot (1-\pi_{ML}) \right)^2} \\
     \leq \ & - m \cdot \frac{1}{\left( a \cdot \pi_{ML} + b \cdot (1-\pi_{ML}) \right)^2} - (n - m) \cdot \frac{1}{\left( b \cdot \pi_{ML} + a \cdot (1-\pi_{ML}) \right)^2} \\
     = \ & - m \cdot \frac{1}{\left( a \cdot \pi_{ML} + (1-a) \cdot (1-\pi_{ML}) \right)^2} - (n - m) \cdot \frac{1}{\left( (1-a) \cdot \pi_{ML} + a \cdot (1-\pi_{ML}) \right)^2} \\
     =\ & -m \cdot \alpha - (n - m) \cdot \beta \\
@@ -384,7 +390,10 @@ Finally, to compute the variance of the estimator of $\piml$, we plug Equation~\
 
 We correctly observe that the variance is undefined for $a=0.5$. Furthermore, we observe that the variance decreases as $n$ increases, which is to be expected as we get more evidence with more data. 
 Lastly, we observe that whenever $a$ approaches either $0$ or $1$, the variance decreases. The same phenomenon is observed for the true value of $\pi$. 
+
 Figure~\ref{fig:variance_heatmap} shows the log-scaled variance of $\pi_{ML}$ as a function of $a$ and $\pi$, which clearly displays the behavior previously described.
+In short, our monte-carlo simulation confirms that the variance of the estimator of $\pi_{ML}$ is maximal whenever $a$ approaches $0.5$, and furthermore increased as $\pi$ approaches $0.5$.
+This makes sense, as whenever $a=0.5$ (or close), there is very little information gained from the answer of the users, a yes could be from both groups. Hence, the variance of the estimator will be very large in this case. Furthermore, whenever one group is much larger than the other (i.e., $\pi \to 0$ or $\pi \to 1$), we exect the answers to be more consistent, and hence the estimation of $\pi$ will be more accurate. Thus, the variance decreases as $\pi$ approaches the extremes of $0$ and $1$.
 
 \begin{figure}[h]
     \centering
@@ -547,16 +556,61 @@ Therefore, we have
 First, we observe that whenever no-one lies ($\ell = 0$), the left side of the MSE of $\pi_{\text{naive}}$ is equal to the left side of the MSE of $\piml$. However, as the right side of the MSE of $\pi_{\text{naive}}$ is multiplied with $\ell^2$, the MSE is zero for $\ell = 0$, whereas the MSE of $\piml$ is non-zero, given $a\notin \{0, 1\}$. If $a\in \{0, 1\}$, then both estimators are equal w.r.t. the MSE.
 
 
-We now solve for both MSE expressions to be equal.
-\begin{align*}
-    \text{MSE}(\pi_{\text{naive}}, \pi) &= \text{MSE}(\pi_{\text{ML}}, \pi) \\
-    \frac{\pi \cdot (1-\ell) - \pi^2 \cdot {(1-\ell)}^2}{n} + \pi^2 \ell^2 & = \frac{\pi - \pi^2}{n} + \frac{a - a^2}{{(2a-1)}^2 \cdot n} &&\mid \cdot\  n \\
-    \pi \cdot (1-\ell) - \pi^2 \cdot {(1-\ell)}^2 + n \cdot \pi^2 \ell^2 & = \pi - \pi^2 + \frac{a - a^2}{{(2a-1)}^2} &&\mid \div \ \pi \\
-    (1-\ell) - \pi \cdot {(1-\ell)}^2 + n \cdot \pi \ell^2 & = 1 - \pi + \frac{a - a^2}{{(2a-1)}^2 \cdot \pi}  \stepandtag \label{eq:mse_equal} \;.
-\end{align*}
+% We now solve for both MSE expressions to be equal.
+% \begin{align*}
+%     \text{MSE}(\pi_{\text{naive}}, \pi) &= \text{MSE}(\pi_{\text{ML}}, \pi) \\
+%     \frac{\pi \cdot (1-\ell) - \pi^2 \cdot {(1-\ell)}^2}{n} + \pi^2 \ell^2 & = \frac{\pi - \pi^2}{n} + \frac{a - a^2}{{(2a-1)}^2 \cdot n} &&\mid \cdot\  n \\
+%     \pi \cdot (1-\ell) - \pi^2 \cdot {(1-\ell)}^2 + n \cdot \pi^2 \ell^2 & = \pi - \pi^2 + \frac{a - a^2}{{(2a-1)}^2} &&\mid \div \ \pi \\
+%     (1-\ell) - \pi \cdot {(1-\ell)}^2 + n \cdot \pi \ell^2 & = 1 - \pi + \frac{a - a^2}{{(2a-1)}^2 \cdot \pi}  \stepandtag \label{eq:mse_equal} \;.
+% \end{align*}
 
-First, we observe that Equation~\ref{eq:mse_equal} for the MSE of $\pi_{\text{naive}}$ increases w.r.t. $n$ whenever $\ell > 0$ and $\pi > 0$, whereas the MSE of $\piml$ does not depend on $n$.
-Therefore, this shows that with increasing sample size, the MSE of $\piml$ decreases faster than the MSE for $\pi_{\text{naive}}$. Therefore, for large sample size, $\piml$ should be preferred over $\pi_{\text{naive}}$.
+% First, we observe that Equation~\ref{eq:mse_equal} for the MSE of $\pi_{\text{naive}}$ increases w.r.t. $n$ whenever $\ell > 0$ and $\pi > 0$, whereas the MSE of $\piml$ does not depend on $n$.
+% Therefore, this shows that with increasing sample size, the MSE of $\piml$ decreases faster than the MSE for $\pi_{\text{naive}}$. Therefore, for large sample size, $\piml$ should be preferred over $\pi_{\text{naive}}$.
+
+Due to the complex expressions, finding the cut-off points for when both MSE expressions are equal --- and therefore finding whenever one estimator is better than the other analytically --- is very complicated.
+While we have explained the trivial edge cases, whenever we have $a \notin \{0, 1\} \land \pi \notin \{0, 1\}$, we have no easy way to determine when which estimator is better than the other. To overcome this issue, we have computed the expected MSE for both estimators for a range of values for $a, \pi, \ell$, and $n$ and show the results in Figure~\ref{fig:mse_naive_better}. 
+Figure~\ref{fig:mse_naive_better} clearly shows the complex, non-linear relationship between both MSE expression. 
+
+First, it is clear that no single best estimator exists for all parameters. 
+The shape of the region where $\pi_{naive}$ has a lower MSE than $\piml$ is quite clear:
+whenever $\ell = 0$, the naive estimator is better than the ML estimator. Furthermore, whenever $\pi = 0$, the naive estimator is also better. Both cases make sense, as whenever no one lies, the naive estimator is the better estimator of the two.
+
+
+\begin{figure}[t]
+    \centering
+    % \includegraphics[width=0.7\textwidth]{MSE_naive_vs_ml_10.png}
+    % \includegraphics[width=0.7\textwidth]{MSE_naive_vs_ml_100.png}
+    \subfloat[For $n = 10$]{\includegraphics[width = 2.5in]{rregion_10.png}}
+    % \subcaption{Meow}
+    \subfloat[For $n = 100$]{\includegraphics[width = 2.5in]{rregion_100.png}}\\
+    \subfloat[For $n = 1\ 000$]{\includegraphics[width = 2.5in]{rregion_1000.png}}
+    \subfloat[For $n = 10\ 000$]{\includegraphics[width = 2.5in]{rregion_10000.png}} 
+    \caption{Plots of the parameter space of $(\pi, a, \ell)$ for various sample sizes $n$. The purple voxels indicate for which parameters the MSE of $\pi_{naive}$ is lower than the MSE of $\piml$.}
+    % \caption{In each subfigure, we plot the MSE of $\piml$ and $\pi_{\text{naive}}$ in 3D (left) and indicate with what parameters the MSE of $$}
+    \label{fig:mse_naive_better}
+\end{figure}
+
+Figure~\ref{fig:mse_naive_better} also shows that whenever $a$ is close or equal to $0.5$, the naive estimator is the better solution. Note that while our plot shows that in the subplot (d), for some parameters which include $a=0.5$, the ML estimator is to be favored. This is not true, as it is simply an artefact of the plotting; We use only 100 points for each axis, and therefore the voxels are quite large. With increased resolution, the same plot would show that the naive estimator is the better solution for these parameters.
+
+Lastly, for all other cases that we did not mention, the ML estimator is the better solution for large $n$. Refer to Figure~\ref{fig:mse_naive_better} for the exact shape. This is logical, as the MSE of the naive estimator has a part independent of $n$, whereas the MSE of the ML estimator is entirely divided by $n$. Thus, for large $n$, the ML estimator will go towards zero, whereas the naive estimator will remain constant.
+
+% While Figure~\ref{} clearly shows the complex, non-linear relationship between both MSE expression, we vary the values of $a$ and $\ell$ together. This only shows a slice of the full parameter space. Therefore, we also plot the region where $\pi_{\text{naive}}$ has a lower MSE than $\piml$ in Figure~\ref{} when varying $\pi, a$, and $\ell$ independently.
+
+
+% \begin{figure}[h]
+%     \centering
+%     % \includegraphics[width=0.7\textwidth]{MSE_naive_vs_ml_10.png}
+%     % \includegraphics[width=0.7\textwidth]{MSE_naive_vs_ml_100.png}
+%     \subfloat[For $n = 10$]{\includegraphics[width = 3in]{MSE_naive_vs_ml_10.png}}
+%     % \subcaption{Meow}
+%     \subfloat[For $n = 100$]{\includegraphics[width = 3in]{MSE_naive_vs_ml_100.png}}\\
+%     \subfloat[For $n = 1\ 000$]{\includegraphics[width = 3in]{MSE_naive_vs_ml_1000.png}}
+%     \subfloat[For $n = 10\ 000$]{\includegraphics[width = 3in]{MSE_naive_vs_ml_10000.png}} 
+%     \caption{\textbf{Left}: log MSE of $\piml$ and $\pi_{\text{naive}}$ in 3D. \textbf{Right}: The region indicating whenever an estimator has a lower MSE than the other. In this figure, we link $a$ and $\ell$ together (they are both on the same axis) as the MSE for both estimators depends on only one of them.}
+%     % \caption{In each subfigure, we plot the MSE of $\piml$ and $\pi_{\text{naive}}$ in 3D (left) and indicate with what parameters the MSE of $$}
+%     \label{fig:mse_naive_vs_ml}
+% \end{figure}
+
 
 
 % Let us now analyze the critical points of both MSE expressions, i.e., whenever they are both equal, to determine when one estimator has a lower MSE than the other.
