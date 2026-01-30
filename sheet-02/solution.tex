@@ -578,7 +578,7 @@ The shape of the region where $\pi_{naive}$ has a lower MSE than $\piml$ is quit
 whenever $\ell = 0$, the naive estimator is better than the ML estimator. Furthermore, whenever $\pi = 0$, the naive estimator is also better. Both cases make sense, as whenever no one lies, the naive estimator is the better estimator of the two.
 
 
-\begin{figure}[t]
+\begin{figure}[th]
     \centering
     % \includegraphics[width=0.7\textwidth]{MSE_naive_vs_ml_10.png}
     % \includegraphics[width=0.7\textwidth]{MSE_naive_vs_ml_100.png}
@@ -815,7 +815,7 @@ Trivially, as the expected behavior of the three other distributions are identic
         \bottomrule
     \end{tabular}
     \caption{Result from $1000$ MC simulations for estimating $\hat{N} \mid p_i \sim U(0, 0.01)$. For each value, we report on the mean (black) and standard deviation (gray). We omit the digits after the decimal point for the standard deviation for brevity.
-    The Error (\%) is the absolute difference between the estimated and the true value of $N$, divided by the true value of $N$.}
+    The Error (\%) is the absolute difference between the estimated and the true value of $N$, divided by the true value of $N$. The Bias is reported as ${\left[ \mathbb{E}[X] - X \right]}^2$.}
     \label{tab:problem_2_results_uniform_0_01}
 \end{table}
 
@@ -881,7 +881,7 @@ Naturally, as each distribution has a different probability density function, an
         \bottomrule
     \end{tabular}
     \caption{Result from $1000$ MC simulations for estimating $\hat{N} \mid p_i \sim U(0, 0.02)$. For each value, we report on the mean (black) and standard deviation (gray). We omit the digits after the decimal point for the standard deviation for brevity.
-    The Error (\%) is the absolute difference between the estimated and the true value of $N$, divided by the true value of $N$.}
+    The Error (\%) is the absolute difference between the estimated and the true value of $N$, divided by the true value of $N$. The Bias is reported as ${\left[ \mathbb{E}[X] - X \right]}^2$.}
     \label{tab:problem_2_results_uniform_0_02}
 \end{table}
 
@@ -1292,7 +1292,7 @@ Most of the A.I. being used for question 2 got scrapped as it did not add any va
     \label{tab:problem_2_results_beta_2_2}
 \end{table}
 
-\begin{table}[t]
+\begin{table}[h]
     \centering 
     \caption*{$p_i \sim U(0, 0.01)$}
     \begin{tabular}{c c|c c c}
@@ -1321,7 +1321,7 @@ Most of the A.I. being used for question 2 got scrapped as it did not add any va
 \end{table}
 
 
-\begin{figure}[t]
+\begin{figure}[h]
     \centering
     \includegraphics[width=\textwidth]{probability_f2_eq_0.png}
     % \includegraphics[\linewidth]{probability_f2_eq_0.png}
@@ -1329,7 +1329,7 @@ Most of the A.I. being used for question 2 got scrapped as it did not add any va
     \label{fig:probability_f2_eq_0_over_time}
 \end{figure}
 
-\begin{figure}[t]
+\begin{figure}[h]
     \centering
     \includegraphics[width=\textwidth]{expectation_f0_f2_eq_0_rescaled.png}
     % \includegraphics[\linewidth]{probability_f2_eq_0.png}
@@ -1344,6 +1344,8 @@ Most of the A.I. being used for question 2 got scrapped as it did not add any va
     \label{fig:interpretation_skewness}
 \end{figure}
 
+\pagebreak
+\newpage
 \subsection{Proof of the dependency of $f_1$ and $f_2$}
 \label{sec:proof_dependency_f1_f2}
 
@@ -1395,7 +1397,7 @@ From the multinomial distribution, we know that the variance of $f_i$ is given b
     V(f_i) = N p_i (1-p_i)\;. \label{eq:variance_f_i}
 \end{equation}
 
-Therefore, we can use Equation~\ref{eq:variance_f_i} to compute the correlation between $f_1$ and $f_2$:
+Therefore, we can use Equation~\ref{eq:variance_f_i} to compute the correlation between $f_1$ and $f_2$ and report it in Table~\ref{tab:correlation_f1_f2}.
 \begin{table}[h]
     \centering
     \begin{tabular}{c|c c c}
