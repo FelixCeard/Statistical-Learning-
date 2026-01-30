@@ -1,0 +1,185 @@
+\documentclass[11pt]{article}
+\usepackage{amsmath,amssymb,amsthm}
+\usepackage[margin=1in]{geometry}
+
+\title{Disproof of a Claim About $\mathbb{E}[\hat N]$}
+\date{}
+
+\newtheorem{proposition}{Proposition}
+\newtheorem{remark}{Remark}
+
+\begin{document}
+\maketitle
+
+\paragraph{Context (Sheet 02, Problem 2).}
+In the capture--recapture simulation used in \texttt{sheet-02/code.ipynb}, the estimator of the population size is
+\[
+\hat N \;=\; n + \hat f_0,
+\]
+where $f_k$ denotes the number of individuals caught exactly $k$ times, $n=\sum_{k\ge 1} f_k$ is the number of distinct observed individuals, and
+\[
+\hat f_0 \;=\;
+\begin{cases}
+\dfrac{f_1(f_1-1)}{2(f_2+1)}, & f_2=0,\\[6pt]
+\dfrac{f_1^2}{2f_2}, & f_2>0.
+\end{cases}
+\]
+
+\paragraph{Claim to assess.}
+The statement in question reads (rewritten with standard expectation notation):
+\begin{quote}
+``$\mathbb{E}[\hat N] > N$, or if $\mathbb{E}[\hat N]=N$, then $\mathbb{E}[\hat N-N] > 0$ for $n<\infty$.'' 
+\end{quote}
+
+\begin{proposition}[The second clause is impossible]
+For any integrable estimator $\hat N$ of a fixed (non-random) parameter $N$,
+\[
+\mathbb{E}[\hat N-N] \;=\; \mathbb{E}[\hat N] - N.
+\]
+In particular, if $\mathbb{E}[\hat N]=N$, then $\mathbb{E}[\hat N-N]=0$.
+\end{proposition}
+
+\begin{proof}
+Linearity of expectation yields
+\[
+\mathbb{E}[\hat N-N]=\mathbb{E}[\hat N]-\mathbb{E}[N]=\mathbb{E}[\hat N]-N,
+\]
+because $N$ is a constant. The special case follows immediately.
+\end{proof}
+
+\begin{remark}
+So the implication ``if $\mathbb{E}[\hat N]=N$ then $\mathbb{E}[\hat N-N]>0$'' is false for all finite or infinite sample sizes; it contradicts basic properties of expectation.
+\end{remark}
+
+\begin{proposition}[The strict inequality $\mathbb{E}(\hat N)>N$ is not generally true]
+There is no general principle forcing $\mathbb{E}[\hat N]>N$ for estimators arising in capture models at finite sample size.
+\end{proposition}
+
+\begin{proof}
+Consider the natural estimator $\tilde N := n$ (the number of distinct observed individuals), which is a standard baseline in the same capture setup.
+
+Assume a simple model consistent with the simulation spirit: there are $N$ individuals, and across $T$ capture occasions each individual is caught independently with per-occasion probability $p\in(0,1)$. Then an individual is observed at least once with probability
+\[
+q \;=\; 1-(1-p)^T \in (0,1)\qquad (T<\infty),
+\]
+and therefore
+\[
+n \sim \mathrm{Binomial}(N,q)
+\quad\Rightarrow\quad
+\mathbb{E}[\tilde N]=\mathbb{E}[n]=Nq < N.
+\]
+Hence even in a basic finite-sampling capture model, one can have $\mathbb{E}[\hat N]<N$ for a reasonable estimator. This disproves any unconditional claim that ``the expected value must exceed $N$.'' 
+\end{proof}
+
+\paragraph{Conclusion.}
+The statement is \emph{false as written}. The second clause is mathematically impossible, and the first clause is not a general truth (even within simple capture models for finite sampling).
+
+\paragraph{How to proceed if you know the catch probability distribution (e.g.\ $p_i\sim U(0,a)$).}
+If your goal is instead to study a \emph{one-sided probability} like
+\[
+\Pr(\hat N > N) > \Pr(\hat N \le N)
+\qquad\Longleftrightarrow\qquad
+\Pr(\hat N > N)>\tfrac12,
+\]
+then you need distributional information about $\hat N$. In the capture setup of the notebook, a common route is:
+
+\subparagraph{Step 1: Specify the per-individual catch-count model.}
+Fix the number of capture occasions $T<\infty$. For individual $i\in\{1,\dots,N\}$ let
+\[
+K_i \mid p_i \sim \mathrm{Binomial}(T,p_i),
+\]
+where $p_i\in(0,1)$ is that individual's per-occasion catch probability. Assume $(p_i)_{i=1}^N$ are i.i.d.\ from some distribution $G$ (e.g.\ $U(0,a)$).
+
+\subparagraph{Step 2: Compute the mixed probabilities $q_k=\Pr(K_i=k)$.}
+Unconditionally, the $K_i$ are i.i.d.\ with the \emph{mixture} pmf
+\[
+q_k \;:=\; \Pr(K_i=k)
+\;=\;
+\binom{T}{k}\,\mathbb{E}_{p\sim G}\!\left[p^k(1-p)^{T-k}\right],
+\qquad k=0,1,\dots,T.
+\]
+For $p\sim U(0,a)$ one gets an explicit integral:
+\[
+q_k
+=
+\binom{T}{k}\frac{1}{a}\int_0^a p^k(1-p)^{T-k}\,\mathrm dp
+=
+\binom{T}{k}\frac{B_a(k+1,T-k+1)}{a},
+\]
+where $B_a(\alpha,\beta)=\int_0^a t^{\alpha-1}(1-t)^{\beta-1}\,\mathrm dt$ is the (lower) incomplete beta function.
+
+\subparagraph{Step 3: Use the multinomial law for the frequency counts.}
+Define $f_k:=\sum_{i=1}^N \mathbf{1}\{K_i=k\}$. Since the $K_i$ are i.i.d.\ with category probabilities $(q_0,\dots,q_T)$,
+\[
+(f_0,f_1,\dots,f_T)\sim \mathrm{Multinomial}\!\left(N;\,q_0,q_1,\dots,q_T\right).
+\]
+In particular,
+\[
+\mathbb{E}[f_k]=Nq_k,\quad
+\mathrm{Var}(f_k)=Nq_k(1-q_k),\quad
+\mathrm{Cov}(f_k,f_\ell)=-Nq_kq_\ell\ (k\neq \ell).
+\]
+Also $n=\sum_{k\ge 1} f_k = N-f_0$, hence $\mathbb{E}[n]=N(1-q_0)$ and $\mathrm{Var}(n)=Nq_0(1-q_0)$.
+
+\subparagraph{Step 4: Approximate the distribution of $\hat N$ (delta method).}
+Ignoring the $f_2=0$ fallback for the moment (see Step 5), the estimator used in the notebook is
+\[
+\hat N \;=\; g(n,f_1,f_2)
+\;:=\;
+n+\frac{f_1^2}{2f_2}\qquad(f_2>0).
+\]
+For large $N$, the multinomial central limit theorem implies
+\[
+(n,f_1,f_2)\approx \mathcal N(m,\Sigma),
+\quad
+m=\big(N(1-q_0),\,Nq_1,\,Nq_2\big),
+\]
+with $\Sigma$ determined by the multinomial covariances. The delta method then gives an approximate normal law
+\[
+\hat N \approx \mathcal N\!\big(\mu_{\hat N},\,\sigma_{\hat N}^2\big),
+\qquad
+\mu_{\hat N}:=g(m)=N\Big(1-q_0+\frac{q_1^2}{2q_2}\Big),
+\]
+and
+\[
+\sigma_{\hat N}^2 \approx \nabla g(m)^\top \Sigma\,\nabla g(m),
+\quad
+\nabla g(m)=\left(1,\ \frac{q_1}{q_2},\ -\frac{q_1^2}{2q_2^2}\right).
+\]
+Using $\mathrm{Cov}(n,f_1)=Nq_0q_1$, $\mathrm{Cov}(n,f_2)=Nq_0q_2$, $\mathrm{Cov}(f_1,f_2)=-Nq_1q_2$, you can write $\sigma_{\hat N}^2$ explicitly as
+\[
+\frac{\sigma_{\hat N}^2}{N}\approx
+q_0(1-q_0)
+\;+\;\Big(\frac{q_1}{q_2}\Big)^2 q_1(1-q_1)
+\;+\;\Big(\frac{q_1^2}{2q_2^2}\Big)^2 q_2(1-q_2)
+\;+\;2\Big(\frac{q_1}{q_2}\Big)q_0q_1
+\;-\;2\Big(\frac{q_1^2}{2q_2^2}\Big)q_0q_2
+\;-\;2\Big(\frac{q_1}{q_2}\Big)\Big(\frac{q_1^2}{2q_2^2}\Big)q_1q_2.
+\]
+
+\subparagraph{Step 5: Compute $\Pr(\hat N>N)$ and check if it exceeds $1/2$.}
+Under the normal approximation,
+\[
+\Pr(\hat N > N)\approx 1-\Phi\!\left(\frac{N-\mu_{\hat N}}{\sigma_{\hat N}}\right).
+\]
+Therefore \(\Pr(\hat N>N)>\tfrac12\) holds approximately whenever \(\mu_{\hat N}>N\), i.e.
+\[
+1-q_0+\frac{q_1^2}{2q_2} > 1
+\quad\Longleftrightarrow\quad
+\frac{q_1^2}{2q_2} > q_0,
+\]
+and the inequality becomes more decisive the larger \((\mu_{\hat N}-N)/\sigma_{\hat N}\) is.
+
+\subparagraph{Step 6: Account for the $f_2=0$ fallback (if needed).}
+In the multinomial model, $f_2\sim \mathrm{Binomial}(N,q_2)$ marginally, so
+\[
+\Pr(f_2=0)=(1-q_2)^N.
+\]
+If $Nq_2$ is moderately large, this probability is negligible and the $f_2>0$ approximation dominates. Otherwise, you must include the fallback definition
+\(\hat f_0=\frac{f_1(f_1-1)}{2(f_2+1)}\) at $f_2=0$ and compute (analytically or by Monte Carlo) the mixture probability
+\[
+\Pr(\hat N>N)=\Pr(\hat N>N\mid f_2=0)\Pr(f_2=0)+\Pr(\hat N>N\mid f_2>0)\Pr(f_2>0).
+\]
+
+\end{document}
+

@@ -2,7 +2,7 @@
 \usepackage{import}
 
 
-\title{Statisitcal Learning and Stochastic Processes \\Sheet 01 }
+\title{Statisitcal Learning and Stochastic Processes \\Sheet 02 }
 \author{Felix Céard-Falkenberg\\7174020}
 
 \usepackage{homework} % See homework.sty %
@@ -16,6 +16,8 @@
 \usepackage{graphicx}
 \usepackage{float}
 \usepackage{subfig}
+
+\usepackage{bbold}
 % \usepackage{minipage}
 
 \usepackage{kantlipsum}
@@ -585,7 +587,7 @@ whenever $\ell = 0$, the naive estimator is better than the ML estimator. Furthe
     \subfloat[For $n = 100$]{\includegraphics[width = 2.5in]{rregion_100.png}}\\
     \subfloat[For $n = 1\ 000$]{\includegraphics[width = 2.5in]{rregion_1000.png}}
     \subfloat[For $n = 10\ 000$]{\includegraphics[width = 2.5in]{rregion_10000.png}} 
-    \caption{Plots of the parameter space of $(\pi, a, \ell)$ for various sample sizes $n$. The purple voxels indicate for which parameters the MSE of $\pi_{naive}$ is lower than the MSE of $\piml$.}
+    \caption{Plots of the parameter space of $(\pi, a, \ell)$ for various sample sizes $n$. The purple voxels indicate for which parameters the MSE of $\pi_{naive}$ is lower than the MSE of $\piml$. Note that plot is mirrored around the $\ell$-axis at $a = 0.5$.}
     % \caption{In each subfigure, we plot the MSE of $\piml$ and $\pi_{\text{naive}}$ in 3D (left) and indicate with what parameters the MSE of $$}
     \label{fig:mse_naive_better}
 \end{figure}
@@ -698,48 +700,519 @@ Lastly, for all other cases that we did not mention, the ML estimator is the bet
 \pagebreak
 \section*{Problem 2}
 
-\begin{table}[h]
+
+We have implemented the given formulas for estimating the population size $\hat{N}$ and its variance $\hat{\sigma}_{\hat{N}}$ given some probability distributions from which we sample the probability of catching one animal. 
+We have run the Monte-Carlo simulations for 1000 runs for each given probabiliy distribution and report on the computed values in Table~\ref{tab:problem_2_results_uniform_0_01} for $p_i \sim U(0, 0.01)$, Table~\ref{tab:problem_2_results_uniform_0_02} for $p_i \sim U(0, 0.02)$, Table~\ref{tab:problem_2_results_beta_1_3} for $p_i \sim 0.02 \cdot \mathrm{Beta}(1, 3)$, and Table~\ref{tab:problem_2_results_beta_2_2} for $p_i \sim 0.01 \cdot \mathrm{Beta}(2, 2)$.
+
+Note that for the sake of ease of comparison, we report on $\hat{\sigma}_{\hat{N}} = \sqrt{\hat{\sigma}_{\hat{N}}^2}$ instead of the variance $\hat{\sigma}_{\hat{N}}^2$ as it allows us to directly compare it with the reported standard deviations of the other parameters.
+
+% \todo[inline]{Compute expected value of catching one animal by 
+% $\mathbb{E}[\Pr(X_i^t = 1)] = \int_0^1 Pr(p \leq q) dq\quad p \sim \Pr(\cdot) \Leftrightarrow \int_0^1 \int_0^q Pr(p' = p) dp' dq$ (something around double integral...)}
+
+In this question, we are interested in the differences that arise from the different probability distributions, besides their performances. 
+% Therefore, we will set out focus on their comparisons.
+
+We first plot the probability distribution for the four probability distributions that we are investigating in Figure~\ref{fig:probability_density_functions}. From that figure, we hypothesize that the expected value of catching one animal is not the same for all four probability distributions. Therefore, let us first compute the expected value of catching one animal for each probability distribution. 
+
+For the uniform distribution $U(0, a)$, with $a\in \mathbb{R}\setminus \{0\}$, we have:
+\begin{align*}
+    \mathbb{E}_{p \sim U(0, a)}[X_i^t] &= \mathbb{E}_{p \sim U(0, a), q\sim U(0, 1)}\left[ q \leq p \right] \\
+    &= \mathbb{E}_{p \sim U(0, a)}\left[ \mathbb{E}_{q\sim U(0, 1)} \left[ q \leq p \right] \right] \\
+    &= \int_0^a f_p(p) \cdot \mathbb{E}_{q\sim U(0, 1)} \left[ q \leq p \right] \  dp \\ 
+    &= \int_0^a \frac{1}{a} \cdot \mathbb{E}_{q\sim U(0, 1)} \left[ q \leq p \right] \  dp \\ 
+    &= \frac{1}{a} \int_0^a \mathbb{E}_{q\sim U(0, 1)} \left[ q \leq p \right] \  dp \\ 
+    &= \frac{1}{a} \int_0^a \int_0^1 f_q(q) \cdot \mathbb{1}\{q \leq p\} \ dq \  dp \\
+    &= \frac{1}{a} \int_0^a \int_0^1 1 \cdot \mathbb{1}\{q \leq p\} \ dq \  dp \\
+    % &= \frac{1}{a} \int_0^a \int_0^1 \mathbb{1}\{q \leq p\} \ dq \  dp \\
+    &= \frac{1}{a} \int_0^a \int_0^p 1 \ dq \  dp \\
+    &= \frac{1}{a} \int_0^a {\left[ q \right]}_0^p \  dp \\
+    &= \frac{1}{a} \int_0^a p \  dp \\
+    &= \frac{1}{a} {\left[ \frac{p^2}{2} \right]}_0^a \\
+    &= \frac{1}{a} \frac{a^2}{2} \\
+    &= \frac{a}{2} \;.
+\end{align*}
+
+It naturally follows that 
+\begin{equation}
+    \mathbb{E}_{p \sim U(0, 0.01)}[X_i^t] = 0.005
+    \label{eq:expectation_xi_u01}
+\end{equation}
+and
+\begin{equation}
+    \mathbb{E}_{p \sim U(0, 0.02)}[X_i^t] = 0.01\;.
+    \label{eq:expectation_xi_u02}
+\end{equation}
+
+For $p\sim \mathrm{Beta}(\cdot)$, we have:
+\begin{align*}
+    \mathbb{E}_{p \sim \mathrm{Beta}(\alpha, \beta)}[X_i^t] &= \mathbb{E}_{p \sim \mathrm{Beta}(\alpha, \beta), q\sim U(0, 1)}\left[ q \leq p \right] \\
+    &= \mathbb{E}_{p \sim \mathrm{Beta}(\alpha, \beta)}\left[ \mathbb{E}_{q\sim U(0, 1)} \left[ q \leq p \right] \right] \\
+    &= \int_0^1 f_{\mathrm{Beta}(\alpha, \beta)}(p) \cdot \mathbb{E}_{q\sim U(0, 1)} \left[ q \leq p \right]\ dp\\
+    &= \int_0^1 f_{\mathrm{Beta}(\alpha, \beta)}(p) \cdot \int_0^1 f_q(q) \cdot \mathbb{1}\{q \leq p\} \ dq \ dp\\
+    &= \int_0^1 f_{\mathrm{Beta}(\alpha, \beta)}(p) \cdot p \  dp \\
+    &= \mathbb{E}_{X\sim \mathrm{Beta}(\alpha, \beta)}\left[ X \right] \\
+    &= \frac{\alpha}{\alpha + \beta}\;. 
+    \stepandtag \label{eq:expectation_beta}
+\end{align*}
+Note that if $p\sim a \cdot \mathrm{Beta}(\cdot)$ with $a\in \mathbb{R} \setminus \{0\}$, we can just multiply Equation~\ref{eq:expectation_beta} with $a$ due to the properties of the expectation and the integrals. $a$ would be contained in the density function as a multiplicative factor, and thus, we can extract it.
+Note that I got the expectation of the Beta distribution from wikipedia.\!\footnote{\url{https://en.wikipedia.org/wiki/Beta_distribution}}
+
+Therefore, it follows that 
+\begin{equation}
+    \mathbb{E}_{p \sim 0.02 \cdot \mathrm{Beta}(1, 3)}[X_i^t] = 0.02 \cdot \frac{1}{4} = 0.005
+    \label{eq:expectation_xi_beta13}
+\end{equation}
+and 
+\begin{equation}
+    \mathbb{E}_{p \sim 0.01 \cdot \mathrm{Beta}(2, 2)}[X_i^t] = 0.01 \cdot \frac{1}{2} = 0.005\;.
+    \label{eq:expectation_xi_beta22}
+\end{equation}
+
+The usefulness of Equation~\ref{eq:expectation_xi_u01}--\ref{eq:expectation_xi_u02} and Equation~\ref{eq:expectation_xi_beta13}--{\ref{eq:expectation_xi_beta22}} expected values will become clear in the next section.
+
+\vspace{1em}
+
+\begin{figure}[t]
+    \centering
+    \includegraphics[width=0.5\textwidth]{probability_density_functions.png}
+    \caption{Probability density functions for the four different probability distributions. We normalize the probability density functions to have a maximum value of 1 for each distribution as we are interested in the relative differences between the different distributions. While the height of the pdfs are not to scale, their shape are.}
+    \label{fig:probability_density_functions}
+\end{figure}
+
+
+\textbf{Expected Behavior.}
+Before discussing the results of the Monte-Carlo simulations in detail, let us first investigate the expected behavior of the simulations.
+
+We have computed the expected number of times an animal is being catched at each time step. Recall that the expected values for $X_i^t$ is $0.005$ for all given distributions, except when $p\sim U(0, 0.01)$, as in that setting, the expected value rises to $0.01$.
+
+Concretely, this means that when using $U(0, 0.01)$ as the probability to catch an animal, the number of times an animal is being catched is twice as high as when using the three other probability distribution.
+Therefore, we expect the estimations of $\hat{N}$ and $\sigma_{\hat{N}}$ to be better when using $p\sim U(0, 0.01)$ as oposed to the other distributions.
+
+Trivially, as the expected behavior of the three other distributions are identical, we expect the estimations of $\hat{N}$ and $\sigma_{\hat{N}}$ to be very identical up to the effect of the randomness introduced by the Monte-Carlo simulations.
+
+\begin{table}[t]
     \centering 
+    \caption*{$p_i \sim U(0, 0.01)$}
     \begin{tabular}{c c|c c c}
         \toprule
-        & & \multicolumn{1}{|c|}{$N=500$} & \multicolumn{1}{c|}{$N=1000$} & \multicolumn{1}{c}{$N=5000$} \\
+        & & \multicolumn{1}{|c|}{${N}=500$} & \multicolumn{1}{c|}{${N}=1000$} & \multicolumn{1}{c}{${N}=5000$} \\
         \midrule
-        \multicolumn{2}{c|}{${\hat{\mathbf{N}}}$} & $590.45 \variance{311}$ & $1096.62 \variance{286}$ & $5152.14\variance{583}$  \\
+        \multicolumn{2}{c|}{${\hat{\mathbf{N}}}$} & $590.45 \variance{311}$ & $1096.62 \variance{286}$ & $5152.14 \variance{583}$  \\
         \multicolumn{2}{c|}{\textbf{Error} (\%)} & $18.09$ & $9.66$ & $3.04$ \\
         % \hline
-        \multicolumn{2}{c|}{$\hat{\mathbf{\sigma}}_{\hat{N}}$} & $239.58\variance{258}$ & $284.17\variance{116}$ & $566.36\variance{98}$\\
+        \multicolumn{2}{c|}{${\hat{\mathbf{\sigma}}}_{\hat{N}}$} & $239.58 \variance{258}$ & $284.17 \variance{116}$ & $566.36 \variance{98}$\\
         % \hline
-        \multirow{2}{*}{\textbf{C.I.}} & $\alpha = 0.05$ & $[299.68\variance{85}; 1322.77\variance{1298}]$ & $[687.34 \variance{137}; 1842.05\variance{609}]$ & $[4179.35\variance{423};6414.78	\variance{804}]$
+        \multirow{2}{*}{\textbf{C.I.}} & $\alpha = 0.05$ & $[299.68 \variance{85}; 1322.77 \variance{1298}]$ & $[687.34 \variance{137}; 1842.05 \variance{609}]$ & $[4179.35 \variance{423}; 6414.78 \variance{804}]$
         \\
         % 
-        & $\alpha = 0.01$ & $[250.36\variance{59}; 1740.30\variance{2079}]$ & $[601.62\variance{110}; 2185.30\variance{773}]$ & $[3922.46\variance{383}; 6884.52\variance{890}]$ \\
+        & $\alpha = 0.01$ & $[250.36 \variance{59}; 1740.30 \variance{2079}]$ & $[601.62 \variance{110}; 2185.30 \variance{773}]$ & $[3922.46 \variance{383}; 6884.52 \variance{890}]$ \\
         \midrule
-        \multirow{2}{*}{\textbf{Coverage} (\%)} & $\alpha = 0.05$ & $94.50\variance{22.80}$ & $95.70\variance{20.29}$ & $94.70\variance{22.40}$ \\
-        & $\alpha = 0.01$ & $99.40\variance{07.72}$ & $99.20\variance{08.91}$ & $99.20\variance{08.91}$ \\
-        \multicolumn{2}{c|}{\textbf{Bias} ($\approx$)} & $8\ 181$ & $9\ 335$ & $23\ 146$ \\
-        \multicolumn{2}{c|}{\textbf{Variance} ($\approx$)} & $96\ 721$ & $81\ 796$ & $339\ 889$ \\
-        \multicolumn{2}{c|}{\textbf{MSE} ($\approx$)} & $104\ 902$ & $91\ 131$ & $363\ 035$ \\
+        \multirow{2}{*}{\textbf{Coverage} (\%)} & $\alpha = 0.05$ & $94.50 \variance{22}$ & $95.70 \variance{20}$ & $94.70 \variance{22}$ \\
+        & $\alpha = 0.01$ & $99.40 \variance{7}$ & $99.20 \variance{8}$ & $99.20 \variance{8}$ \\
+        \multicolumn{2}{c|}{\textbf{Bias} ($\approx$)} & $8\ 181$ & $9\ 334$ & $23\ 147$ \\
+        \multicolumn{2}{c|}{\textbf{Variance} ($\approx$)} & $124\ 464$ & $94\ 211$ & $330\ 364$ \\
+        \multicolumn{2}{c|}{\textbf{MSE} ($\approx$)} & $132\ 646$ & $103\ 546$ & $353\ 512$ \\
         \bottomrule
     \end{tabular}
-    \caption{Result from $1000$ MC simulations for estimating $\hat{N}$. For each value, we report on the mean (black) and standard deviation (gray). We omit the digits after the decimal point for the standard deviation for brevity.
-    The Error (\%) is the absolute difference between the estimated and the true value of $N$, divided by the true value of $N$. Hence, it measures the relative error of the estimated value to the true value.}
-    \label{tab:problem_2_results}
+    \caption{Result from $1000$ MC simulations for estimating $\hat{N} \mid p_i \sim U(0, 0.01)$. For each value, we report on the mean (black) and standard deviation (gray). We omit the digits after the decimal point for the standard deviation for brevity.
+    The Error (\%) is the absolute difference between the estimated and the true value of $N$, divided by the true value of $N$.}
+    \label{tab:problem_2_results_uniform_0_01}
 \end{table}
 
-\textbf{Observation.}
-We implement the formulas and run the Monte-Carlo simulations for 1000 runs and report the results in Table~\ref{tab:problem_2_results}.
-We first observe that, although the absolute error between the estimated and the true value of $N$ increases with $N$, the relative error decreases when the true $N$ is larger.
+\textbf{Observations.}
+Let us first look at Table~\ref{tab:problem_2_results_uniform_0_01} which contains the result when using $p\sim U(0, 0.01)$.
 
-Interestingly, the given formula proposed for estimating the variance of $\hat{N}$ is very accurate, as its average value is very close to the computed variance of the Monte-Carlo simulation --- in our case, we report on the standard deviation, which is simply the square root of the variance.
+First, it is very clear that increasing the true population size $N$ decreases the relative error of the estimator. 
+Furthermore, the estimated population size $\hat{N}$ is close to the true value of $N$ for all three settings of our simulation with a deviation of approximately 90--150 animals. 
 
-% However, we also observe a high standard deviation of the values returned by the proposed formula. While a variance of zero is not to be expected, we believe that the estimation of the variance is also noisy on its own, and need to be 
+Interestingly, although the absolute error of the population estimation increases with the true number of population, the relative error of the estimated population size to the true population size decreases with increasing true population size $N$. Whereas for a small population size ($N=500$), the relative error is approximately 18\%, for larger population sizes ($N=5000$), the relative error drops to only 3\%.
 
-Lastly, we computed the averaged confidence intervals across all runs for $\alpha=0.05$ and $\alpha=0.01$. Naturally, the confidence intervals when using $\alpha=0.01$ are larger than when using $\alpha=0.05$, we notice that the standard deviation of the lower confidence decreases when increasing the size of the Confidence Interval (C.I.), whereas the standard deviation of the upper-confidence increases when decreasing $\alpha$. 
-% As the upper- and lower-confidence use different formulas with different structure,  
+The estimated standard deviation ($\hat{\sigma}_{\hat{N}} = \sqrt{\hat{\sigma}_{\hat{N}}^2}$) from the given formula perfectly matches the standard deviation computed by the Monte-Carlo simulation (refer to the gray value next to the $\hat{N}$ estimate).
+Nevertheless, it is important to denote that the standard deviation of the estimated variance is very large (e.g., $\sigma_{\hat{\sigma}_{\hat{N}}} = \pm 258$ for $\hat{\sigma}_{\hat{N}} = 239.58$), hence, the estimated variance can deviate significantly across different runs. Therefore, the estimated variance is only trustworthy for large population sizes.
 
-\textbf{Discussion.}
+It is worth mentioning that although the standard deviation increases with increased population size $N$, the variance of the estimated standard deviation of the estimation of the population size decreases the larger $N$ becomes. 
 
-\todo[inline]{the Biase, Variance, and MSE are computed on the aggregated values from the table manually. Computing them from the true values does slightly change the results (slight increase in MSE), however, the relationship between the three cases ($N=500$, $N=1000$, $N=5000$) remain the same.}
+We compute the coverage (percentage of times the true population size is contained in the confidence interval) for different values of $\alpha\in \{0.05, 0.01\}$ and observe that, regardless of the true population size $N$, the average coverage matches the expected coverage of the specified confidence intervals.
+
+Interestingly, the standard deviation of the computed coverage from the Monte-Carlo simulation remains stable across all population sizes; We have a standard deviation of $\pm 22$ percentage points for $\alpha=0.05$ and $\pm 8$ percentage points for $\alpha = 0.01$.
+
+Finally, and most interestingly, we also compute the Bias, Variance, and the Mean Squared Error (MSE) for each context of our simulations.
+In Table~\ref{tab:problem_2_results_uniform_0_01}, we observe that the bias only increases slightly from $N=500 \to N=1000$ (from $90^2 \to 96^2$) but increases drastically for $N=1000 \to N=5000$, where the bias increases by $2.5$ times.
+
+Most interestingly, the variance does not follow a simple pattern. While increasing $N=500 \to N=1000$ drops the variance by $23.7\%$ (around 30 000 units of absolute difference), when increasing the true population size from $N=1000 \to N=5000$, we observe an increase of the variance of the estimation of the population size $350\%$.
+
+Finally, because the variance is around 1 order of magnitude larger than the bias term, the MSE follows the general trend described in the variance.
+
+\textbf{Comparison to other Probability Distributions.}
+While we went into details on the results from Table~\ref{tab:problem_2_results_uniform_0_01}, these results result from $p\sim U(0, 0.01)$ and may therefore deviate from the results for the other probability distributions.
+
+First, as hypothesized previously, the results between 
+\begin{itemize}
+    \item $p \sim U(0, 0.01)$ - See Table~\ref{tab:problem_2_results_uniform_0_01}
+    \item $p \sim 0.02 \cdot \mathrm{Beta}(1, 3)$ - See Table~\ref{tab:problem_2_results_beta_1_3}
+    \item $p \sim 0.01 \cdot \mathrm{Beta}(2, 2)$ - See Table~\ref{tab:problem_2_results_beta_2_2}
+\end{itemize}
+are extremely similar.
+In fact, not only are the returned values all within the standard deviation of the results from each other --- regardless of the true population size or the metric.
+Naturally, as each distribution has a different probability density function, and that Monte-Carlo simulation inherently introduces some noise, the results slightly differs between Table~\ref{tab:problem_2_results_uniform_0_01}, Table~\ref{tab:problem_2_results_beta_1_3}, and Table~\ref{tab:problem_2_results_beta_2_2}.
+
+\begin{table}[t]
+    \centering 
+    \caption*{$p_i \sim U(0, 0.02)$}
+    \begin{tabular}{c c|c c c}
+        \toprule
+        & & \multicolumn{1}{|c|}{${N}=500$} & \multicolumn{1}{c|}{${N}=1000$} & \multicolumn{1}{c}{${N}=5000$} \\
+        \midrule
+        \multicolumn{2}{c|}{${\hat{\mathbf{N}}}$} & $527.70 \variance{98}$ & $1035.16 \variance{134}$ & $5088.17 \variance{284}$  \\
+        \multicolumn{2}{c|}{\textbf{Error} (\%)} & $5.54$ & $3.52$ & $1.76$ \\
+        % \hline
+        \multicolumn{2}{c|}{${\hat{\mathbf{\sigma}}}_{\hat{N}}$} & $97.71 \variance{29}$ & $133.04 \variance{27}$ & $288.03 \variance{25}$\\
+        % \hline
+        \multirow{2}{*}{\textbf{C.I.}} & $\alpha = 0.05$ & $[381.03 \variance{57}; 774.58 \variance{172}]$ & $[818.85 \variance{91}; 1347.52 \variance{198}]$ & $[4568.45 \variance{240}; 5700.59 \variance{337}]$
+        \\
+        % 
+        & $\alpha = 0.01$ & $[348.62 \variance{49}; 882.73 \variance{206}]$ & $[765.73 \variance{82}; 1471.85 \variance{225}]$ & $[4421.98 \variance{228}; 5914.73 \variance{356}]$ \\
+        \midrule
+        \multirow{2}{*}{\textbf{Coverage} (\%)} & $\alpha = 0.05$ & $95.00 \variance{21}$ & $95.30 \variance{21}$ & $94.60 \variance{22}$ \\
+        & $\alpha = 0.01$ & $99.40 \variance{7}$ & $98.80 \variance{10}$ & $98.70 \variance{11}$ \\
+        \multicolumn{2}{c|}{\textbf{Bias} ($\approx$)} & $767$ & $1\ 236$ & $7\ 774$ \\
+        \multicolumn{2}{c|}{\textbf{Variance} ($\approx$)} & $10\ 398$ & $18\ 460$ & $83\ 612$ \\
+        \multicolumn{2}{c|}{\textbf{MSE} ($\approx$)} & $11\ 166$ & $19\ 696$ & $91\ 387$ \\
+        \bottomrule
+    \end{tabular}
+    \caption{Result from $1000$ MC simulations for estimating $\hat{N} \mid p_i \sim U(0, 0.02)$. For each value, we report on the mean (black) and standard deviation (gray). We omit the digits after the decimal point for the standard deviation for brevity.
+    The Error (\%) is the absolute difference between the estimated and the true value of $N$, divided by the true value of $N$.}
+    \label{tab:problem_2_results_uniform_0_02}
+\end{table}
+
+However, when we look at Table~\ref{tab:problem_2_results_uniform_0_02}, which contains the results for $p\sim U(0, 0.02)$, which has a higher expected value (see Equation~\ref{eq:expectation_xi_u02}), we observe that, indeed, the values differ (significantly) from the results of the other distributions.
+
+First, the deviation of the estimated to the true population size is significantly lower for $p\sim U(0, 0.02)$ compared to the other distributions. 
+The relative error is the perfect metric to quantify the change in deviation, as it decreases from 18\% for $p\sim U(0, 0.01)$ to 5.54\% for $p\sim U(0, 0.02)$ when $N=500$, which is a decrease of $70\%$. Increasing the true population size to larger values has a similar effect. For example, for $N=5000$, the relative error drops from 3\% to 1.76\%.
+
+We remark that the estimated standard deviation and the true standard deviation of the estimated population size are very similar for $p\sim U(0, 0.02)$ too, with a lower standard deviation compared to the other distributions.
+
+Similarly, the coverage remains stable across all population sizes, demonstrating that the confidence intervals are well-calibrated. Note that the standard deviation of the coverage is the same as for the other distributions, indicating that the std.\ of the converage is potentially independent of the probability distribution used.
+
+Finally, the MSE follows a different pattern as computed for the other distributions.
+While the bias increases with the same pattern but lower values as the other distributions, the variance also increases linearly with the size of the true population size. 
+Therefore, the MSE roughtly follows a linear increase with the size of the true population size.
+
+However, the increase in the quality of the estimators is significant, as the MSE for $N=5000$ drops from around 350 000 units to around 90 000 units, which is a decrease of around 75\%.
+
+
+\textbf{Discussion --- MSE.}
+One of the most surprising observations is the change of the MSE w.r.t.\ the true population size. The results from Table~\ref{tab:problem_2_results_uniform_0_01} and Table~\ref{tab:problem_2_results_beta_2_2} show that the MSE (and variance) follows a v shape when increasing the true population size, where $N=1000$ has the lowest MSE when comparing to $N=500$ and $N=5000$.
+
+We hypothesize that this phenomenon is simply due to the fact that the number of steps ($T=40$) is too low to obtain accurate estimations when using probability distribitions that have a low $\mathbb{E}\left[ X_i^t = 1 \right]$.
+We hypothesize that doubling the number of time steps should give us similar results as the results from Table~\ref{tab:problem_2_results_uniform_0_02} with $p\sim U(0, 0.02)$.
+
+This hypothesis is supported by the results in Table~\ref{tab:problem_2_results_uniform_0_02} where the MSE follows a linear increase w.r.t.\ $N$.
+
+To verify our hypothesis, we run the simulation using $p\sim U(0, 0.01)$ for twice as long, namely $T=80$ instead of 40 time steps. We report on the results in Table~\ref{tab:problem_2_results_extra_long} in the Appendix.
+In short, we observe that the results from Table~\ref{tab:problem_2_results_extra_long} matches the results obtained in Table~\ref{tab:problem_2_results_uniform_0_02}, therefore validating our hypthesis.
+
+\textbf{Discussion --- Estimated Population Size.}
+Interestingly, the estimated population size reported by our Monte-Carlo simulations always over-estimate the true population size. 
+We want to understand this better, and understand whether this is a systematic property of the given estimator.
+
+First, we hypothesize that most of the variance is due to the estimation of $\hat{f_0}$. As the given formula for estimating $\hat{f_0}$ is dependent on whether $f_2 \neq 0$ or $f_2 = 0$, we aim to first understand how similar both formulas are.
+To this end, we plot in Figure~\ref{fig:f0_hat_comparison} the estimated $\hat{N}$ over 100 time steps for a single run of the Monte-Carlo simulation with true population size $N=1000$ and $p\sim U(0, 0.01)$.
+
+In Figure~\ref{fig:f0_hat_comparison}, we clearly observe that, whenever $f_2 = 0 \to f_2 > 0$, the estimation of $\hat{f_0}$ is not continuous in time and drasticaly drops. Interestingly, as soon as $f_2 > 0$, the estimator of $\hat{N}$ seems to approach the true population size. 
+
+We also plot the true value for $f_0$ and the estimated value for $\hat{f_0}$ over the same number of time steps in Figure~\ref{fig:f0_hat_comparison}. 
+We can clearly see that the estimated values for $\hat{f_0}$ approach the true value for $f_0$ over time.
+
+\begin{figure}[t]
+    \centering
+    \includegraphics[width=\textwidth]{single_run.png}
+    \caption{Single run of the Monte-Carlo simulation for estimating $\hat{N}$ with a true population size of $N=1000$ and a probability distribution of $p_i \sim U(0, 0.01)$.}
+    \label{fig:f0_hat_comparison}
+\end{figure}
+
+
+
+We remark that the behavior observed in Figure~\ref{fig:f0_hat_comparison} is not systematic, as the jump is very extreme. We found this example by chance when plotting the results for a single run. However, it provides us with great insights into the behavior of the estimators.
+
+\textbf{Derivation --- Estimated Population Size.}
+
+In the remaining part of this section, we will investigate analytically whether the over-estimation of the population size is a systematic property of the given estimator.
+
+
+Formally, we are interested in the following question
+\begin{equation}
+    \Pr(\hat{N} > N) > \Pr(\hat{N} \leq N)\;.
+    \label{eq:goal_equation}
+\end{equation}
+
+To this end, we will assume that the estimator is unbiased, i.e., that $\mathbb{E}[\hat{N}] = N$. 
+Note that Equation~\ref{eq:goal_equation} is not in contradiction with the unbiasness of the estimator, as the expected value is the value towards which the estimator converges to in the limit of the number of samples. However, for finite samples, even if the estimator has a theoretical mean of $N$, if the distribution of the estimated population size is skewed, it is possible that Equation~\ref{eq:goal_equation} holds. 
+
+% Whether this is the case is beyond the scope of this assignment. Investigating this could be an interesting future work.
+
+Before we start, let us first formally define some notation and defintions of $f_i$ that allows us to derive the probability for $\hat{N} > N$.
+
+Let us denote an animal as $X_i$ with $i\in \{1, \dots, N\}$ and $X_i^t\in \{0, 1\}$ denoting whether the animal $i$ has been caught at time step $t$.
+Therefore, we can define 
+\begin{equation*}
+    X_i = \sum_{t=1}^T X_i^t\;,
+\end{equation*}
+i.e., the total number of times the animal has been caught after $T$ time steps.
+
+Logically, we have that $X_i^t \sim \mathrm{Bernoulli}(p)$ with $p$ being the probability of being caught at time step $t$. In our setting, $p$ follows a specified probability distribution.
+
+We have that $X_i^t$ are i.i.d.\ w.r.t.\ the time steps $t$ and the animals $i$. These are important assumptions.
+From this, it follows that $X_i \sim \mathrm{Binomial}(T, p)$ as we have a sum of $T$ independent Bernoulli variables.
+
+We can now formally define $f_k$ as follows using the following set 
+\begin{equation*}
+    S_k = \left\{ X_i : i \in \{1, \dots, N\} \mid X_i = k \right\}
+\end{equation*}
+which contains all the animals that have been caught exactly $k$ times within the $T$ time steps.
+Therefore, $f_k$ can be defined as follows:
+\begin{equation*}
+    f_k = |S_k|\;.
+\end{equation*}
+
+Because $f_k$ is a random variable, we can define the probability distribution of $f_k$ w.r.t.\ the number of time steps $t$ as binomial distribution:
+\begin{align*}
+    \Pr(f_k = n\mid T=t) = \mathrm{Binomial}(N, n, \Pr(X_i = k\mid T=t))\;. \quad n \in \{0, 1, \dots, N\}
+\end{align*}
+
+Therefore, we need to compute the probability of an animal being caught exactly $k$ times within the $T$ time steps. We have
+\begin{align*}
+    \Pr(X_i = k \mid T=t') = \mathrm{Binomial}(t', k, \Pr(X_i^t = 1))
+\end{align*}
+where $\Pr(X_i^t = 1)$ is the probability of an animal being caught at time step $t$.
+Because $X_i^t$ is a binary variable, its expected value is its probability, and we can therefore re-use the expected values for the different given probabilities that we computed earlier (see Equation~\ref{eq:expectation_xi_u01},~\ref{eq:expectation_xi_u02},~\ref{eq:expectation_xi_beta13},~\ref{eq:expectation_xi_beta22}).
+
+% We derive the following proposition, which we will use later. Note that Equation~\ref{} is entirely derived by ChatGPT as I was searching whether there were known results for this property. I could have easily derived it myself, however, I wanted to be sure that it lead somewhere. Note that I added some intermediate steps such that I understand each step fully:
+% \begin{align*}
+%     n \cdot \binom{N}{n} &= n \frac{N!}{n!(N-n)!} \\
+%     &= \frac{N!}{(n-1)!(N - n)!} \\
+%     &= N\frac{(N-1)!}{(n-1)!(N-n)!} \\
+%     % &= N\frac{(N-1)!}{(n-1)!(N-n-1)!\cdot(N-n)} \stepandtag \label{eq:binomial_property} \\
+%     % &= N \frac{(N-1)!}{(n-1)!((N-1)-(n-1))!}
+%     % &= N \frac{(N-1)!}{(n-1)!(N-n)!} \\
+%     &= N \frac{(N-1)!}{(n-1)!(N-1-n+1)!} \\
+%     &= N \frac{(N-1)!}{(n-1)!((N-1)-(n-1))!} \\
+%     &= N \binom{N-1}{n-1}
+% \end{align*}
+
+We can now compute the expected value for each $f_k$:
+{
+\allowdisplaybreaks
+\begin{align*}
+    \mathbb{E}\left[ f_k \mid T=t \right] &= \sum_{n=0}^N n \cdot \Pr(f_k = n \mid T=t) \\
+    &= \sum_{n=1}^N n \cdot \mathrm{Binomial}(N, n, \Pr(X_i = k \mid T=t)) \\
+    &= \sum_{n=1}^N n \cdot \mathrm{Binomial}(N, n, \mathrm{Binomial}(t, k, p)) 
+    % &&p = \mathbb{E}[X_i^t = 1]
+    \\
+    &= \sum_{n=1}^N n \cdot \mathrm{Binomial}\left( N, n, \binom{t}{k} p^k {(1-p)}^{t-k} \right) \\
+    &= \mathbb{E}\left[ \mathrm{Binomial} \left( N, n, \binom{t}{k} p^k {(1-p)}^{t-k} \right) \right] \\
+    &= N \cdot \binom{t}{k} p^k {(1-p)}^{t-k}
+\end{align*}
+}
+% We can simplify this further by using the Binomial theorem (also known as Binomial expension).\!\footnote{See \url{https://en.wikipedia.org/wiki/Binomial_theorem}. The idea of using it came from ChatGPT, as I was searching for ways to simplify the expression with the complex power.}
+
+Therefore, we can now compute the expected value for $n$:
+\begin{align*}
+    \mathbb{E}\left[ n \right] &= \mathbb{E}\left[ \sum_{t=1}^T f_k \right] \\
+    &= \sum_{k=1}^T \mathbb{E}\left[ f_k \right] \\
+    &= \sum_{k=1}^T \mathbb{E}\left[ f_k \mid T=T\right] \\
+    % &= \sum_{k=1}^T \mathbb{E}\left[ f_k \mid T=T\right] \\
+    &= \sum_{k=1}^T N \cdot \binom{t}{k} p^k {(1-p)}^{T-k} \\
+    &= N \cdot \sum_{k=1}^T \binom{t}{k} p^k {(1-p)}^{T-k} \\
+    &= N \cdot \left[ \left( \sum_{k=0}^T \binom{t}{k} p^k {(1-p)}^{T-k} \right) - \binom{t}{0} p^0 {(1-p)}^{T-0}  \right] \\
+    &= N \cdot \left[ 1 - 1{(1-p)}^{T} \right]  \\
+    &= N \cdot \left( 1 - {(1-p)}^T \right) \stepandtag \label{eq:expected_value_n}\;.
+\end{align*}
+We report on the expected values for $n$ with $T=40$ for our four probability distributions in Table~\ref{tab:expected_value_n}.
+\begin{table}[t]
+    \centering
+    \begin{tabular}{c|c c c}
+        \toprule
+         & \multicolumn{3}{c}{Expected Value for $n$} \\
+        \midrule
+        $N$ & $500$ & $1000$ & $5000$ \\
+        \midrule
+        $U(0, 0.01)$ & $90.83$ & $181.67$ & $908.39$\\
+        $U(0, 0.02)$ & $165.51$ & $331.02$ & $1655.14$\\
+    \end{tabular}
+    \caption{Expected value for $n$ for $T=40$ and $N \in \{500, 1000, 5000\}$ for the different probability distributions.}
+    \label{tab:expected_value_n}
+\end{table}
+Note that Equation~\ref{eq:expected_value_n} is equal to 
+\begin{align*}
+    \mathbb{E}\left[ n \right] &= N \cdot \left( 1 - {(1-p)}^T \right) \\
+    &= N \cdot \left( 1 - \binom{T}{0} p^0 (1-p)^T \right) \\
+    &= N - N \cdot \binom{T}{0} p^0 (1-p)^T \\
+    &= N - \mathbb{E}\left[ f_0 \mid T=T \right] 
+\end{align*}
+which is exactly what we would expect.
+% Let us now compute the skewness of the distribution of $n$. 
+% Because we know that $f_k$ follows a binomial distribution, we can compute 
+
+Because $\hat{N} = n + \hat{f_0}$, we now compute the expected value for $\hat{f_0}$.
+As $\hat{f_0}$ is conditional on whether $f_2 \neq 0$ or $f_2 = 0$, we need to compute the probability of $f_2 = 0$ and $f_2 \neq 0$.
+% Note that we assume that $f_2 \neq 0$, as otherwise we would need to marginalize over the probability of $f_2 = 0$. Given that we have $T \gg 0$, we expect the probability of $f_2 = 0$ to be extremely small, and therefore negligable.
+% Nevertheless, we can easily compute the probability of $f_2 = 0$:
+Because we model $f_k$ as a binomial distribution, we can easily compute the probability of $\Pr(f_2 = 0)$. We have 
+\begin{align*}
+    \Pr(f_2 = 0 \mid T=T) &= \mathrm{Binomial}(N, 0, \Pr(X_i = 2\mid T=T)) \\
+    &= (1 - \Pr(X_i = 2\mid T=T))^N \\
+    &= {\left( 1 - \mathrm{Binomial}(T, 2, p) \right)}^N\;.
+\end{align*}
+We report on the probabilities for our four probability distributions for $p$ in Table~\ref{tab:probability_f2_eq_0}. We also plot the probability changing over time in Figure~\ref{fig:probability_f2_eq_0_over_time}.
+
+\begin{table}[t]
+    \centering
+    \begin{tabular}{c|c c c}
+        \toprule
+         & \multicolumn{3}{c}{$\Pr(f_2 = 0 \mid T=40)$} \\
+        \midrule
+        $N$ & $500$ & $1000$ & $5000$ \\
+        \midrule
+        $p=0.01$ & $1.3 \times 10^{-12}$ & $1.7 \times 10^{-24}$ & $1.6 \times 10^{-119}$ \\
+        $p=0.005$ & $2.96 \times 10^{-4}$ & $8.77 \times 10^{-8}$ & $5.19 \times 10^{-36}$ \\
+        % \bottomrule
+    \end{tabular}
+    \caption{Probability for $f_2 = 0$ $n$ for $T=40$ and $N \in \{500, 1000, 5000\}$ for the different probability distributions.}
+    \label{tab:probability_f2_eq_0}
+\end{table}
+
+
+
+
+Before investigating the case where $f_2\neq 0$, let us first investigate the bias of $\hat{f_0}\mid f_2 = 0$.
+We have 
+{
+\allowdisplaybreaks
+\begin{align*}
+    \mathbb{E}\left[ \hat{f_0} \mid f_2 = 0, T=t \right] &= \mathbb{E}\left[ \frac{f_1^2 - f_1}{2} \right] \\ 
+    &= \sum_{n=0}^N \frac{n^2 - n}{2} \cdot \Pr(f_1 = n \mid T=t) \\
+    &= \sum_{n=0}^N \frac{n^2 - n}{2} \cdot \mathrm{Binomial}(N, n, \Pr(X_i = 1 \mid T=t)) \\
+    &= \sum_{n=0}^N \frac{n^2 - n}{2} \cdot \mathrm{Binomial}(N, n, \mathrm{Binomial}(t, 1, p)) \\
+    &= \sum_{n=0}^N \frac{n^2 - n}{2} \cdot \mathrm{Binomial}(N, n, \binom{t}{1} p^1 {(1-p)}^{t-1})
+    % &= \sum_{n=0}^N \frac{n^2 - n}{2} \cdot \binom{N}{n} {\left( \binom{t}{1} p^1 {(1-p)}^{t-1} \right)}^{n} {\left( 1 - \binom{t}{1} p^1 {(1-p)}^{t-1} \right)}^{N-n} \\
+    % &= \sum_{n=0}^N \frac{n^2 - n}{2} \cdot \binom{N}{n} {\binom{t}{1}}^n p^n {(1-p)}^{(t-1)\cdot n} {\left( 1 - \binom{t}{1} p^1 {(1-p)}^{t-1} \right)}^{N-n} \\
+\end{align*}
+which we we cannot simplify further (at least such that is gives us more insights). We use python to compute the expected value for $\hat{f_0} \mid f_2 = 0, T=40$ for our four probability distributions and report on the results in Table~\ref{tab:expected_value_f0_f2_eq_0}. While the expected values for $\hat{f_0}\mid f_2 = 0$ are very large, it is easy to see that when multiplied with the probability of $f_2 = 0$, we would get values that are almost zero. The interested reader can find a plot describing the rescaled expected value in Figure~\ref{fig:expectation_f0_f2_eq_0_rescaled} in the Appendix.
+
+
+\begin{table}[t]
+    \centering
+    \begin{tabular}{c|c c c}
+        \toprule
+         & \multicolumn{3}{c}{$\mathbb{E}[\hat{f_0} \mid f_2 = 0, T=40]$} \\
+        \midrule
+        $N$ & $500$ & $1000$ & $5000$ \\
+        \midrule
+        $p=0.01$  & $9113.93$   & $36492.25$  & $913036.85$ \\
+        $p=0.005$ & $3375.21$   & $13514.37$  & $338129.79$ \\
+        % \bottomrule
+    \end{tabular}
+    \caption{Expected value for $\hat{f_0}$ conditioned on $f_2 = 0$ for $T=40$ and $N \in \{500, 1000, 5000\}$ for different values of $p$.}
+    \label{tab:expected_value_f0_f2_eq_0}
+\end{table}
+}
+
+Let us now investigate the bias of $\hat{f_0}$ when $f_2 \neq 0$. As $\hat{f_0}$ is defined as a function of $f_1$ and $f_2$, and that both of them are dependent,\!\footnote{We attach in the Appendix (See Section~\ref{sec:proof_dependency_f1_f2}) a proof of the dependency of $f_1$ and $f_2$ generated by ChatGPT.  As the proof is not critical for the continuation of this derivation, we add it to the Appendix for the interested reader. Note that while we have deleted the exact output of ChatGPT, the idea of this proof is still to be credited to ChatGPT.} we have to model their probability jointly for a fully analytical derivation.
+While it is very tempting to add a independence assumption on the distributions of $f_1$ and $f_2$, their correlation is too strong to be ignored, and the obtained results are not meaningful.\!\footnote{This was our first attempt. However, our formula estimated $\mathbb{E}[\hat{f_0}\mid f_2 > 0, T=40]$ to be almost zero for all probability distributions and sample sizes.}
+% However, as modeling the joint probability is very complex, we resort to an approximation by introducing an assumption that doesn't hold.
+% Therefore, for ease of computability, we will assume that $f_1$ and $f_2$ are independent. Note that their correlation is not zero, and can be meaningful for larger catching probabilities $p$. 
+We show the correlations for our probability distributions in Table~\ref{tab:correlation_f1_f2} in the Appendix.
+
+% We can now compute the expected value of $\hat{f_0}\mid f_2 > 0$ as follows:
+% {
+% \allowdisplaybreaks
+% \begin{align*}
+%     \mathbb{E}[\hat{f_0}\mid f_2 > 0] &= \mathbb{E}\left[ \frac{f_1^2}{2 f_2} \mid f_2 > 0 \right] \\
+%     &= \sum_{n=0}^{N-1} \sum_{m=1}^{N-n} \frac{n^2}{2 m} \cdot \Pr(f_1 = n \mid T=t) \cdot \Pr(f_2 = m \mid T=t) \stepandtag \label{eq:expectation_f0_f2_gt_0}
+%     % &= \sum_{n=0}^{N-1} \sum_{m=1}^{N-n} \frac{n^2}{2 m} \cdot \Pr(f_1 = n \mid T=t) \cdot \Pr(f_2 = m \mid T=t) \stepandtag \label{eq:expectation_f0_f2_gt_0}
+%     % &= \sum_{n=0}^{N-1} \sum_{m=1}^{N-n} \frac{n^2}{2 m} \cdot \Pr(f_1 = n \mid T=t) \cdot \Pr(f_2 = m \mid T=t) \\
+% \end{align*}
+% which we could simplify further, however, we believe that we would not gain a relationship to $f_0$ by doing so. Therefore, we resort to modeling the expectation from Equation~\ref{eq:expectation_f0_f2_gt_0} using Python. 
+% }
+
+The only way to compute $\mathbb{E}[\hat{f_0}\mid f_2 > 0]$ is by marginalizing over all possible values for all $f_i$ with $f_i \notin \{1, 2\}$, i.e.,
+\begin{align*}
+    \mathbb{E}[\hat{f_0}\mid f_2 > 0] &= \mathbb{E}\left[ \frac{f_1^2}{2 f_2} \mid f_2 > 0 \right] \\
+    &= \sum_{n=0}^{N-1} \sum_{m=1}^{N-n} \frac{n^2}{2 m} \cdot \Pr(f_1 = n, f_2 = m \mid T=t) \\
+    &= \sum_{n=0}^{N-1} \sum_{m=1}^{N-n} \frac{n^2}{2 m} \cdot \left( \sum_{k_3 = 0}^{N-n-m} \cdots \sum_{k_N = 0}^{N-n-m-\sum_{i=3}^{N}k_i} \Pr(f_1 = n, f_2 = m, f_3 = k_3, \dots, f_N=k_N \mid T=t) \right) \stepandtag \label{eq:expectation_f0_f2_gt_0_marginalized}
+\end{align*}
+which is computationally infeasible. Furthermore, we cannot simplify Equation~\ref{eq:expectation_f0_f2_gt_0_marginalized} , as every $f_i$ is dependent on each $f_j$ with $i\neq j$. Note that especially for our simulation size, using $N=5000$ would result in a value proportional to $2^{5000}$, which is a number with 1506 digits.
+
+Therefore, without further assumptions, we are unsure whether we can show that $N$ is unbiased --- let alone skewed --- in a fully analytical way.
+
+Nevertheless, as we can model individual $f_i$ using a binomial distribution, we can model the skewness of both $f_1$ and $f_2$ analytically. This might give us some insights into whether Equation~\ref{eq:goal_equation} holds.
+
+
+\textbf{Skewness}
+
+Let us now investigate the skewness of $f_i \sim \mathrm{Binomial}(T, p_i)$. 
+It is a well known fact that the skewness of a binomial distribution is given by 
+\begin{equation*}
+    \mathrm{Skewness}(f_i) = \frac{(1-p) - p}{\sqrt{N \cdot p \cdot (1-p)}}\;.
+\end{equation*}
+
+For $f_1$, we have that 
+\begin{align*}
+    \mathrm{Skewness}(f_1) &= \frac{(1 - \Pr(X_i = 1 \mid T=T)) - \Pr(X_i = 1 \mid T=T)}{\sqrt{N \cdot \Pr(X_i = 1 \mid T=T) \cdot (1 - \Pr(X_i = 1 \mid T=T))}} \\
+    &= \frac{\left( 1 - \binom{T}{1} p^1 {(1-p)}^{T-1} \right) - \binom{T}{1} p^1 {(1-p)}^{T-1}}{\sqrt{
+        N \cdot \left( 1 - \binom{T}{1} p^1 {(1-p)}^{T-1} \right) \cdot \binom{T}{1} p^1 {(1-p)}^{T-1}
+    }} \\
+    &= \frac{ 1 - 2 \cdot \binom{T}{1} p^1 {(1-p)}^{T-1}}{\sqrt{
+        N \cdot \left( 1 - \binom{T}{1} p^1 {(1-p)}^{T-1} \right) \cdot \binom{T}{1} p^1 {(1-p)}^{T-1}
+    }} 
+\end{align*}
+which we will compute using python. This results in the results shown in Table~\ref{tab:skewness_f1_f2}.
+
+
+\begin{table}[t]
+    \centering
+    \begin{tabular}{c|c c c| c c c}
+        \toprule
+         & \multicolumn{3}{c}{$\mathrm{Skewness}(f_1)$} & \multicolumn{3}{c}{$\mathrm{Skewness}(f_2)$} \\
+        \midrule
+        $N$ & $500$ & $1000$ & $5000$ & $500$ & $1000$ & $5000$ \\
+        \midrule
+        $p=0.01$  & $0.0463$   & $0.0327$  & $0.0146$ & $0.17799$ & $0.12585$ & $0.05628$ \\
+        $p=0.005$ & $0.0809$   & $0.0572$  & $0.0256$ & $0.34368$ & $0.24302$ & $0.10868$ \\
+        % \bottomrule
+    \end{tabular}
+    \caption{Skewness for $f_1$ and $f_2$ for $T=40$ when modeled as a binomial distribution.}
+    \label{tab:skewness_f1_f2}
+\end{table}
+
+Recall that a positive value for skewness indicates that the distribution has a median and mode on the left of the mean, and therefore the majority of the values are on the left, and the distribution is tailed to the right. A negative value has the same interpretation, but flipped. We added a visualization of the interpretation of the value of skewness in Figure~\ref{fig:interpretation_skewness} in the Appendix.
+
+From Table~\ref{tab:skewness_f1_f2}, it is easy to see that all values are positive. Therefore, we know that $f_1$ and $f_2$ have the majority of their values to the left of the mean, i.e., have a lower value than the mean.
+Naturally, the more samples we have, the less skewed the distribution is, this is also reflected in the table.
+
+We are unable to compute the skewness of $n$, which follows the same argument as above, namely that all the $f_i$ are dependent on each other. While all the $f_i$ can be modeled using a multinomial distribution, a closed form solution to the skewness of a multinomial distribution is unknown to us, we couldn't find any literature on the topic.
+% This could be an interesting topic for future research --- assuming that it is even possible.
+Therefore, we assume that $n$ is either not skewed, or very lightly skewed in the oposite direction of $\hat{f_0}$. Otherwise, our argument does not hold.
+
+However, and this is very interesting, we can say something about the skewness of $\hat{f_0}$.
+When looking at the skewness of $\hat{f_0}$ in Table~\ref{tab:skewness_f1_f2}, we see that $f_1$ is less skewed than $f_2$. In fact, $f_2$ is skewed around 4--5 times more than $f_1$.
+This is a very important and interesting observation. 
+
+This shows that, for small and finite samples, we are more likely to sample values for $f_1$ and $f_2$ below the mean than above. The inequality in the skewness from Table~\ref{tab:skewness_f1_f2} indicates that, $f_2$ is sampled more below the expected value of $f_2$ than compared to $f_1$.
+
+As we divide the less undersampled value by the more undersampled value, we argue that $\hat{f_0}$ is negatively skewed. This follows from the argument that, assuming that $\mathbb{E}[\hat{f_0}] = f_0$ holds, we would $\frac{f_1}{f_2} \approx 5$, which would mean that we overestimate $f_0$.\!\footnote{We have not used skewness in any work before. Therefore, we are unsure if this is correct. However, that this ration is larger than 1 is what we are trying to argue.}
+As we are squaring the $f_1$ value, and only increasing the value of $f_2$ linearly in $\hat{f_0}$, we believe that this reduces the extremeness of the skewness of $\hat{f_0}$ significantly.
+
+Therefore, assuming that $\mathbb{E}\left[ \hat{f_0} \right] = f_0$ holds, we argue that Equation~\ref{eq:goal_equation} holds.
+How to prove this formally is unknown to us; We believe that this statement is not true in general --- as in the limit, the skewness, variance, and bias becomes zero --- but we argue that especially for small finite samples, the statement holds.
+
+We tried to get some help from ChatGPT, as we hope that it can uncover some theorems unknown to us. While it gave us a negative answer on whether the statement holds, it said that if if our distribution is log-concave, then $P(X < E[X]) \geq \frac{1}{2}$ holds for some random variable $X \sim G$ with $G$ being a log-concave positively skewed distribution.
+As the Binomial distribution is log-concave,\!\footnote{See \url{https://en.wikipedia.org/wiki/Logarithmically_concave_function}. We are unsure if this is correct for all cases, especially ours.}, we \textit{could} argue that because we hypothesize that $\frac{f_1^2}{2f_2}$ is negatively skewed, we have $P(\hat{f_0} > f_0) \geq \frac{1}{2}\Rightarrow P(\hat{f_0} > f_0) > P(\hat{f_0} \leq f_0)$. But as we are unsure about the correctness of our argument, we will only mention it here.
+
+% This unequality in the skewness means that, when sampling for values of $f_1$ during our simulations, we are 
+
+
 
 
 
@@ -750,11 +1223,197 @@ Unless stated otherwise, all code, text, and math derivations have been entirely
 
 We used Claude 4.5 Opus for generating the plots for Figure~\ref{fig:mse_naive_better} as the plot is not a core of the assignment, and only aids in understanding our own results. Note that we (heavily) modified the code generated by Claude.
 
+For question 2 of the assignment, we used ChatGPT 5.2 to help us with some of the math of the derivations. The end product is ~90\% my own, indepent work. 
+Most of the A.I. being used for question 2 got scrapped as it did not add any value to the report. The most notable scrapped work was finding some result to $\mathbb{E}\left[ \frac{f_1^2}{2f_2} \right]$, but as both are dependent, only very limited results were found by ChatGPT.\!\footnote{This may also be due to my bad prompting.}
+
 % I used ChatGPT to help find literature on the properties of integration, differentiation.
 
 % Furthermore, when researching for denoising algorithms, I used ChatGPT to get a general overview of the available general denoising algorithms. After finding the Bayesian denoising algorithm, I used Claude 4.5 Sonnet to write the code for the Bayesian denoising algorithm (based on existing code for Bayesian denoising implemented for 2D images). As the exact algorithm is not at the core of the assignment or the course, and that the results of both denoising methods are very similar, I believe that this usage is acceptable.
 
 
+\appendix
+\section*{Additional Tables}
+
+\begin{table}[h]
+    \centering 
+    \caption*{$p_i \sim 0.02 \cdot \mathrm{Beta}(1, 3)$}
+    \begin{tabular}{c c|c c c}
+        \toprule
+        & & \multicolumn{1}{|c|}{${N}=500$} & \multicolumn{1}{c|}{${N}=1000$} & \multicolumn{1}{c}{${N}=5000$} \\
+        \midrule
+        \multicolumn{2}{c|}{${\hat{\mathbf{N}}}$} & $572.21 \variance{249}$ & $1102.16 \variance{327}$ & $5165.82 \variance{579}$  \\
+        \multicolumn{2}{c|}{\textbf{Error} (\%)} & $14.44$ & $10.22$ & $3.32$ \\
+        % \hline
+        \multicolumn{2}{c|}{${\hat{\mathbf{\sigma}}}_{\hat{N}}$} & $223.18 \variance{168}$ & $288.20 \variance{146}$ & $568.22 \variance{96}$\\
+        % \hline
+        \multirow{2}{*}{\textbf{C.I.}} & $\alpha = 0.05$ & $[296.06 \variance{80}; 1241.40 \variance{822}]$ & $[688.71 \variance{147}; 1861.17 \variance{749}]$ & $[4189.85 \variance{421}; 6432.61 \variance{798}]$
+        \\
+        % 
+        & $\alpha = 0.01$ & $[248.36 \variance{58}; 1610.48 \variance{1203}]$ & $[602.47 \variance{115}; 2212.82 \variance{975}]$ & $[3932.12 \variance{381}; 6903.90 \variance{882}]$ \\
+        \midrule
+        \multirow{2}{*}{\textbf{Coverage} (\%)} & $\alpha = 0.05$ & $94.60 \variance{22}$ & $94.00 \variance{23}$ & $94.60 \variance{22}$ \\
+        & $\alpha = 0.01$ & $98.90 \variance{10}$ & $98.80 \variance{10}$ & $98.90 \variance{10}$ \\
+        \multicolumn{2}{c|}{\textbf{Bias} ($\approx$)} & $5\ 214$ & $10\ 436$ & $27\ 495$ \\
+        \multicolumn{2}{c|}{\textbf{Variance} ($\approx$)} & $78\ 120$ & $104\ 540$ & $332\ 210$ \\
+        \multicolumn{2}{c|}{\textbf{MSE} ($\approx$)} & $83\ 334$ & $114\ 977$ & $359\ 705$ \\
+        \bottomrule
+    \end{tabular}
+    \caption{Result from $1000$ MC simulations for estimating $\hat{N}$. For each value, we report on the mean (black) and standard deviation (gray). We omit the digits after the decimal point for the standard deviation for brevity.
+    The Error (\%) is the absolute difference between the estimated and the true value of $N$, divided by the true value of $N$.}
+    \label{tab:problem_2_results_beta_1_3}
+\end{table}
+
+\begin{table}[h]
+    \centering 
+    \caption*{$p_i \sim 0.01 \cdot \mathrm{Beta}(2, 2)$}
+    \begin{tabular}{c c|c c c}
+        \toprule
+        & & \multicolumn{1}{|c|}{${N}=500$} & \multicolumn{1}{c|}{${N}=1000$} & \multicolumn{1}{c}{${N}=5000$} \\
+        \midrule
+        \multicolumn{2}{c|}{${\hat{\mathbf{N}}}$} & $582.90 \variance{314}$ & $1093.58 \variance{294}$ & $5128.88 \variance{565}$  \\
+        \multicolumn{2}{c|}{\textbf{Error} (\%)} & $16.58$ & $9.36$ & $2.58$ \\
+        % \hline
+        \multicolumn{2}{c|}{${\hat{\mathbf{\sigma}}}_{\hat{N}}$} & $235.15 \variance{275}$ & $281.72 \variance{121}$ & $561.35 \variance{93}$\\
+        % \hline
+        \multirow{2}{*}{\textbf{C.I.}} & $\alpha = 0.05$ & $[297.63 \variance{84}; 1303.01 \variance{1391}]$ & $[687.38 \variance{139}; 1831.89 \variance{634}]$ & $[4164.29 \variance{411}; 6379.84 \variance{776}]$
+        \\
+        % 
+        & $\alpha = 0.01$ & $[249.11 \variance{59}; 1716.36 \variance{2272}]$ & $[602.16 \variance{110}; 2171.47 \variance{808}]$ & $[3909.42 \variance{373}; 6844.99 \variance{858}]$ \\
+        \midrule
+        \multirow{2}{*}{\textbf{Coverage} (\%)} & $\alpha = 0.05$ & $95.30 \variance{21}$ & $95.50 \variance{20}$ & $95.40 \variance{20}$ \\
+        & $\alpha = 0.01$ & $99.10 \variance{9}$ & $99.10 \variance{9}$ & $98.80 \variance{10}$ \\
+        \multicolumn{2}{c|}{\textbf{Bias} ($\approx$)} & $6\ 871$ & $8\ 757$ & $16\ 608$ \\
+        \multicolumn{2}{c|}{\textbf{Variance} ($\approx$)} & $131\ 042$ & $94\ 106$ & $323\ 905$ \\
+        \multicolumn{2}{c|}{\textbf{MSE} ($\approx$)} & $137\ 913$ & $102\ 864$ & $340\ 514$ \\
+        \bottomrule
+    \end{tabular}
+    \caption{Result from $1000$ MC simulations for estimating $\hat{N}$. For each value, we report on the mean (black) and standard deviation (gray). We omit the digits after the decimal point for the standard deviation for brevity.
+    The Error (\%) is the absolute difference between the estimated and the true value of $N$, divided by the true value of $N$.}
+    \label{tab:problem_2_results_beta_2_2}
+\end{table}
+
+\begin{table}[t]
+    \centering 
+    \caption*{$p_i \sim U(0, 0.01)$}
+    \begin{tabular}{c c|c c c}
+        \toprule
+        & & \multicolumn{1}{|c|}{${N}=500$} & \multicolumn{1}{c|}{${N}=1000$} & \multicolumn{1}{c}{${N}=5000$} \\
+        \midrule
+        \multicolumn{2}{c|}{${\hat{\mathbf{N}}}$} & $517.55 \variance{100}$ & $1022.24 \variance{129}$ & $5057.81 \variance{290}$  \\
+        \multicolumn{2}{c|}{\textbf{Error} (\%)} & $3.51$ & $2.22$ & $1.16$ \\
+        % \hline
+        \multicolumn{2}{c|}{${\hat{\mathbf{\sigma}}}_{\hat{N}}$} & $95.08 \variance{31}$ & $130.52 \variance{27}$ & $285.44 \variance{26}$\\
+        % \hline
+        \multirow{2}{*}{\textbf{C.I.}} & $\alpha = 0.05$ & $[374.85 \variance{57}; 757.81 \variance{181}]$ & $[809.99 \variance{88}; 1328.62 \variance{193}]$ & $[4542.75 \variance{244}; 5664.70 \variance{345}]$
+        \\
+        % 
+        & $\alpha = 0.01$ & $[343.31 \variance{49}; 863.09 \variance{218}]$ & $[757.85 \variance{78}; 1450.54 \variance{219}]$ & $[4397.59 \variance{232}; 5876.88 \variance{364}]$ \\
+        \midrule
+        \multirow{2}{*}{\textbf{Coverage} (\%)} & $\alpha = 0.05$ & $95.00 \variance{21}$ & $95.20 \variance{21}$ & $94.60 \variance{22}$ \\
+        & $\alpha = 0.01$ & $98.80 \variance{10}$ & $99.60 \variance{6}$ & $98.40 \variance{12}$ \\
+        \multicolumn{2}{c|}{\textbf{Bias} ($\approx$)} & $307$ & $494$ & $3\ 342$ \\
+        \multicolumn{2}{c|}{\textbf{Variance} ($\approx$)} & $10\ 013$ & $17\ 769$ & $82\ 162$ \\
+        \multicolumn{2}{c|}{\textbf{MSE} ($\approx$)} & $10\ 321$ & $18\ 263$ & $85\ 504$ \\
+        \bottomrule
+    \end{tabular}
+    \caption{Same configuration as for Table~\ref{tab:problem_2_results_uniform_0_01}, but we run the simulation for twice as long ($T=80$).}
+    \label{tab:problem_2_results_extra_long}
+\end{table}
+
+
+\begin{figure}[t]
+    \centering
+    \includegraphics[width=\textwidth]{probability_f2_eq_0.png}
+    % \includegraphics[\linewidth]{probability_f2_eq_0.png}
+    \caption{Probability for $f_2 = 0$ over 40 times steps for different population sizes. Note that}
+    \label{fig:probability_f2_eq_0_over_time}
+\end{figure}
+
+\begin{figure}[t]
+    \centering
+    \includegraphics[width=\textwidth]{expectation_f0_f2_eq_0_rescaled.png}
+    % \includegraphics[\linewidth]{probability_f2_eq_0.png}
+    \caption{The expected value for $\hat{f_0}$ conditioned on $f_2 = 0$ over 40 times steps for different population sizes. We multiply the expected value by the probability of $f_2 = 0$ at each time step.}
+    \label{fig:expectation_f0_f2_eq_0_rescaled}
+\end{figure}
+
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=\textwidth]{skewness.png}
+    \caption{Interpretation of the skewness of a distribution.}
+    \label{fig:interpretation_skewness}
+\end{figure}
+
+\subsection{Proof of the dependency of $f_1$ and $f_2$}
+\label{sec:proof_dependency_f1_f2}
+
+\begin{tcolorbox}[colframe=red!80!black, colback=red!10, boxrule=1pt, arc=4pt, left=6pt, right=6pt, top=4pt, bottom=4pt]
+\textbf{Custom Note:} \\
+The idea of this proof is to be credited to ChatGPT.
+
+The current proof is just our own interpretation of the proof generated by ChatGPT, which we have deleted in the mean time.
+\end{tcolorbox}
+
+We can model the probability distribution of all $f_k$
+jointly as a multinomial distribution.
+
+In statistics, we can define two variables as independent if their covariance is zero.
+
+From the multionomial distribution, we know that the covariance between $f_i$ and $f_j$ is given by 
+\begin{equation*}
+    \mathrm{Cov}(f_i, f_j) = -N p_i p_j\;.
+\end{equation*}
+
+Therefore, we have that 
+\begin{align*}
+    \mathrm{Cov}(f_1, f_2) &= -N p_1 p_2 \\
+    &= -N \cdot \Pr(X_i = 1\mid T=t) \cdot \Pr(X_i = 2 \mid T=t) \\
+    &= -N \cdot \mathrm{Binomial}(T, 1, p) \cdot \mathrm{Binomial}(T, 2, p)
+\end{align*}
+Naturally, we see that the Covariance is not zero, but slightly negative, and therefore the two variables are not independent.
+
+For our four probability distributions, we have the following covariance values:
+\begin{table}[h]
+    \centering
+    \begin{tabular}{c|c c c}
+        \toprule
+         & \multicolumn{3}{c}{$\mathrm{Cov}(f_1, f_2)$} \\
+        \midrule
+        $N$ & $500$ & $1000$ & $5000$ \\
+        \midrule
+        $p=0.01$  & $-7.20$   & $-14.39$  & $-71.95$ \\
+        $p=0.005$ & $-1.33$   & $-2.65$   & $-13.26$ \\
+        % \bottomrule
+    \end{tabular}
+    \caption{Covariance for $f_1$ and $f_2$ for $T=40$ and $N \in \{500, 1000, 5000\}$ for different values of $p$.}
+    % \label{tab:covariance_f1_f2}
+    % \label{tab:expected_value_f0_f2_eq_0}
+\end{table}
+
+From the multinomial distribution, we know that the variance of $f_i$ is given by
+\begin{equation}
+    V(f_i) = N p_i (1-p_i)\;. \label{eq:variance_f_i}
+\end{equation}
+
+Therefore, we can use Equation~\ref{eq:variance_f_i} to compute the correlation between $f_1$ and $f_2$:
+\begin{table}[h]
+    \centering
+    \begin{tabular}{c|c c c}
+        \toprule
+         & \multicolumn{3}{c}{$\mathrm{Corr}(f_1, f_2)$} \\
+        \midrule
+        $N$ & $500$ & $1000$ & $5000$ \\
+        \midrule
+        $p=0.01$  & $-0.1443$   & $-0.1443$  & $-0.1443$ \\
+        $p=0.005$ & $-0.0568$   & $-0.0568$  & $-0.0568$ \\
+        % \bottomrule
+    \end{tabular}
+    \caption{Covariance for $f_1$ and $f_2$ for $T=40$ and $N \in \{500, 1000, 5000\}$ for different values of $p$.}
+    \label{tab:correlation_f1_f2}
+    % \label{tab:expected_value_f0_f2_eq_0}
+\end{table}
+
+\qed
 
 
 \end{document}
