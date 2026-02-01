@@ -1,0 +1,57 @@
+\documentclass{report}
+\usepackage{import}
+
+
+\title{Statisitcal Learning and Stochastic Processes}
+\author{Felix Céard-Falkenberg 7174020
+\\
+Yiquan Hu 2629526}
+
+\usepackage{homework} % See homework.sty %
+\usepackage{amsmath}
+\usepackage{amssymb} 
+\usepackage[utf8]{inputenc}
+\usepackage{todonotes}
+\usepackage{multirow}
+\usepackage{multicol}
+\usepackage{booktabs}
+\usepackage{graphicx}
+\usepackage{float}
+\usepackage{subfig}
+\usepackage{bbold}
+\usepackage{kantlipsum}
+\usepackage[bottom]{footmisc}
+
+
+\newcommand*\dif{\mathop{}\mathrm{d}}
+\newcommand{\stepandtag}{%
+  \refstepcounter{equation}%
+  \tag{\theequation}%
+}
+\newcommand{\var}{\ensuremath{\text{Var}}}
+\newcommand{\group}{\ensuremath{\text{Group}}}
+\newcommand{\piml}{\ensuremath{\pi_{ML}}}
+\newcommand{\variance}[1]{\ensuremath{\text{\small \textcolor{gray}{$\pm #1$}}}}
+% \newcommand{\variance}[1]{\text{\tiny\textcolor{gray}{$\pm$ #1}}}
+
+
+\begin{document}
+
+\tableofcontents
+\newpage
+
+
+\input{part_A}
+
+\pagebreak
+
+\input{part_B}
+
+\input{appendix}
+
+
+% I used ChatGPT to help find literature on the properties of integration, differentiation.
+
+% Furthermore, when researching for denoising algorithms, I used ChatGPT to get a general overview of the available general denoising algorithms. After finding the Bayesian denoising algorithm, I used Claude 4.5 Sonnet to write the code for the Bayesian denoising algorithm (based on existing code for Bayesian denoising implemented for 2D images). As the exact algorithm is not at the core of the assignment or the course, and that the results of both denoising methods are very similar, I believe that this usage is acceptable.
+
+\end{document}
